@@ -33,176 +33,144 @@ public class AuthManager {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(LOGIN_URL);
-                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                    urlConnection.setRequestMethod("POST");
-                    urlConnection.setRequestProperty("Content-Type", "application/json");
+                    if (email.equals("demo.user.apps@zeeid.net") && password.equals("demo")) {
+                        // Data JSON Offline
+                        JSONObject offlineResponse = new JSONObject();
+                        offlineResponse.put("name", "Demo User");
+                        offlineResponse.put("email", "demo.user.apps@zeeid.net");
+                        offlineResponse.put("jml_baner", 1);
+                        offlineResponse.put("ReLoadBaner", 0);
+                        offlineResponse.put("TimerBaner", 60);
+                        offlineResponse.put("ReLoadInata", 20);
+                        offlineResponse.put("jml_inata", 1);
+                        offlineResponse.put("TimerInata", 60);
+                        offlineResponse.put("isClearCache", 0);
+                        offlineResponse.put("isVPNProtection", 0);
+                        offlineResponse.put("isTestAds", 0);
+                        offlineResponse.put("isRotation", 0);
+                        offlineResponse.put("isMixadstype", 0);
+                        offlineResponse.put("isIndoprot", 0);
+                        offlineResponse.put("isKeepgoing", 0);
+                        offlineResponse.put("isAcakSponsor", 0);
+                        offlineResponse.put("maxsuccess", 10);
+                        offlineResponse.put("maxfail", 10);
 
-                    // Buat JSON body untuk request login
-                    JSONObject jsonBody = new JSONObject();
-                    jsonBody.put("email", email);
-                    jsonBody.put("password", password);
+                        // Simulasi array iklan
+                        offlineResponse.put("Iklan_Layar_Pembuka_Aplikasi", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/9257395921") // App Open Ad
+                                .put("ca-app-pub-3940256099942544/9257395921")); // Bisa pakai sama atau tambah lagi kalau mau variasi
 
-                    // Kirim body request
-                    BufferedOutputStream outputStream = new BufferedOutputStream(urlConnection.getOutputStream());
-                    outputStream.write(jsonBody.toString().getBytes());
-                    outputStream.flush();
+                        offlineResponse.put("Iklan_Banner_Adaptif", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/9214589741")); // Adaptive Banner
 
-                    // Dapatkan response code dari server
-                    int responseCode = urlConnection.getResponseCode();
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        // Baca response
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                        StringBuilder response = new StringBuilder();
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            response.append(line);
-                        }
-                        reader.close();
+                        offlineResponse.put("Iklan_Banner_Ukuran_Tetap", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/6300978111")); // Fixed Size Banner
 
-                        // Parsing JSON response
-                        JSONObject jsonResponse = new JSONObject(response.toString());
+                        offlineResponse.put("Iklan_Interstisial", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/1033173712")); // Interstitial
 
-                        Log.d("RESPNSE", String.valueOf(jsonResponse));
+                        offlineResponse.put("Iklan_Iklan_Reward", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/5224354917")); // Rewarded Ad
 
-                        // Ambil data dari response
-                        String name = jsonResponse.getString("name");
-                        String userEmail = jsonResponse.getString("email");
-                        int jml_baner = jsonResponse.getInt("jml_baner");
-                        int ReLoadBaner = jsonResponse.getInt("ReLoadBaner");
-                        int TimerBaner = jsonResponse.getInt("TimerBaner");
-                        int ReLoadInata = jsonResponse.getInt("ReLoadInata");
-                        int jml_inata = jsonResponse.getInt("jml_inata");
-                        int TimerInata = jsonResponse.getInt("TimerInata");
-                        int isClearCache = jsonResponse.getInt("isClearCache");
-                        int isVPNProtection = jsonResponse.getInt("isVPNProtection");
-                        int isTestAds = jsonResponse.getInt("isTestAds");
-                        int isRotation = jsonResponse.getInt("isRotation");
-                        int isMixadstype = jsonResponse.getInt("isMixadstype");
-                        int isIndoprot = jsonResponse.getInt("isIndoprot");
-                        int isKeepgoing = jsonResponse.getInt("isKeepgoing");
-                        int isAcakSponsor = jsonResponse.getInt("isAcakSponsor");
-                        int maxsuccess = jsonResponse.getInt("maxsuccess");
-                        int maxfail = jsonResponse.getInt("maxfail");
+                        offlineResponse.put("Iklan_Interstisial_Reward", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/5354046379")); // Rewarded Interstitial
 
-                        
+                        offlineResponse.put("Iklan_Native", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/2247696110")); // Native
 
-                        // Simpan data ke SharedPreferences
-                        SharedPreferences sharedPref = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("name", name);
-                        editor.putString("email", userEmail);
-                        editor.putString("password", password);
-                        editor.putInt("jml_baner", jml_baner);
-                        editor.putInt("ReLoadBaner", ReLoadBaner);
-                        editor.putInt("TimerBaner", TimerBaner);
-                        editor.putInt("ReLoadInata", ReLoadInata);
-                        editor.putInt("jml_inata", jml_inata);
-                        editor.putInt("TimerInata", TimerInata);
-                        editor.putInt("isClearCache", isClearCache);
-                        editor.putInt("isVPNProtection", isVPNProtection);
-                        editor.putInt("isTestAds", isTestAds);
-                        editor.putInt("isRotation", isRotation);
-                        editor.putInt("isMixadstype", isMixadstype);
-                        editor.putInt("isIndoprot", isIndoprot);
-                        editor.putInt("isKeepgoing", isKeepgoing);
-                        editor.putInt("isAcakSponsor", isAcakSponsor);
-                        editor.putInt("maxsuccess", maxsuccess);
-                        editor.putInt("maxfail", maxfail);
+                        offlineResponse.put("Iklan_Video_Native", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/1044960115")); // Native Video
 
 
+                        saveLoginData(context, offlineResponse, email, password);
 
-                        // Simpan arrays
-                        saveJSONArrayToPreferences(editor, "Iklan_Layar_Pembuka_Aplikasi", jsonResponse.optJSONArray("Iklan_Layar_Pembuka_Aplikasi"));
-                        saveJSONArrayToPreferences(editor, "Iklan_Banner_Adaptif", jsonResponse.optJSONArray("Iklan_Banner_Adaptif"));
-                        saveJSONArrayToPreferences(editor, "Iklan_Banner_Ukuran_Tetap", jsonResponse.optJSONArray("Iklan_Banner_Ukuran_Tetap"));
-                        saveJSONArrayToPreferences(editor, "Iklan_Interstisial", jsonResponse.optJSONArray("Iklan_Interstisial"));
-                        saveJSONArrayToPreferences(editor, "Iklan_Iklan_Reward", jsonResponse.optJSONArray("Iklan_Iklan_Reward"));
-                        saveJSONArrayToPreferences(editor, "Iklan_Interstisial_Reward", jsonResponse.optJSONArray("Iklan_Interstisial_Reward"));
-                        saveJSONArrayToPreferences(editor, "Iklan_Native", jsonResponse.optJSONArray("Iklan_Native"));
-                        saveJSONArrayToPreferences(editor, "Iklan_Video_Native", jsonResponse.optJSONArray("Iklan_Video_Native"));
-
-                        editor.apply(); // Simpan perubahan
-
-
-                        JSONArray layarPembukaAplikasi = jsonResponse.optJSONArray("Iklan_Layar_Pembuka_Aplikasi");
-                        if (layarPembukaAplikasi != null) {
-                            for (int i = 0; i < layarPembukaAplikasi.length(); i++) {
-                                String adCode = layarPembukaAplikasi.getString(i);
-
-                            }
-                        }
-
-                        JSONArray bannerAdaptif = jsonResponse.optJSONArray("Iklan_Banner_Adaptif");
-                        if (bannerAdaptif != null) {
-                            for (int i = 0; i < bannerAdaptif.length(); i++) {
-                                String adCode = bannerAdaptif.getString(i);
-                                Log.d("Iklan_Banner_Adaptif", "Ad Code " + (i + 1) + ": " + adCode);
-                            }
-                        }
-
-                        JSONArray bannerUkuranTetap = jsonResponse.optJSONArray("Iklan_Banner_Ukuran_Tetap");
-                        if (bannerUkuranTetap != null) {
-                            for (int i = 0; i < bannerUkuranTetap.length(); i++) {
-                                String adCode = bannerUkuranTetap.getString(i);
-                                Log.d("Iklan_Banner_Ukuran_Tetap", "Ad Code " + (i + 1) + ": " + adCode);
-                            }
-                        }
-
-                        JSONArray interstisial = jsonResponse.optJSONArray("Iklan_Interstisial");
-                        if (interstisial != null) {
-                            for (int i = 0; i < interstisial.length(); i++) {
-                                String adCode = interstisial.getString(i);
-                                Log.d("Iklan_Interstisial", "Ad Code " + (i + 1) + ": " + adCode);
-                            }
-                        }
-
-                        JSONArray iklanReward = jsonResponse.optJSONArray("Iklan_Iklan_Reward");
-                        if (iklanReward != null) {
-                            for (int i = 0; i < iklanReward.length(); i++) {
-                                String adCode = iklanReward.getString(i);
-                                Log.d("Iklan_Iklan_Reward", "Ad Code " + (i + 1) + ": " + adCode);
-                            }
-                        }
-
-                        JSONArray interstisialReward = jsonResponse.optJSONArray("Iklan_Interstisial_Reward");
-                        if (interstisialReward != null) {
-                            for (int i = 0; i < interstisialReward.length(); i++) {
-                                String adCode = interstisialReward.getString(i);
-                                Log.d("Iklan_Interstisial_Reward", "Ad Code " + (i + 1) + ": " + adCode);
-                            }
-                        }
-
-                        JSONArray nativeAds = jsonResponse.optJSONArray("Iklan_Native");
-                        if (nativeAds != null) {
-                            for (int i = 0; i < nativeAds.length(); i++) {
-                                String adCode = nativeAds.getString(i);
-                                Log.d("Iklan_Native", "Ad Code " + (i + 1) + ": " + adCode);
-                            }
-                        }
-
-                        JSONArray videoNative = jsonResponse.optJSONArray("Iklan_Video_Native");
-                        if (videoNative != null) {
-                            for (int i = 0; i < videoNative.length(); i++) {
-                                String adCode = videoNative.getString(i);
-                                Log.d("Iklan_Video_Native", "Ad Code " + (i + 1) + ": " + adCode);
-                            }
-                        }
-
-                        // Jika login berhasil, panggil callback dengan true
+                        // Callback sukses
                         callback.onLoginResult(true);
-                    } else {
-                        // Jika login gagal, panggil callback dengan false
-                        callback.onLoginResult(false);
-                    }
 
+                    } else {
+                        // Proses login normal ke server
+                        URL url = new URL(LOGIN_URL);
+                        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                        urlConnection.setRequestMethod("POST");
+                        urlConnection.setRequestProperty("Content-Type", "application/json");
+
+                        // Buat JSON body untuk request login
+                        JSONObject jsonBody = new JSONObject();
+                        jsonBody.put("email", email);
+                        jsonBody.put("password", password);
+
+                        // Kirim body request
+                        BufferedOutputStream outputStream = new BufferedOutputStream(urlConnection.getOutputStream());
+                        outputStream.write(jsonBody.toString().getBytes());
+                        outputStream.flush();
+
+                        // Dapatkan response code dari server
+                        int responseCode = urlConnection.getResponseCode();
+                        if (responseCode == HttpURLConnection.HTTP_OK) {
+                            // Baca response
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                            StringBuilder response = new StringBuilder();
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                response.append(line);
+                            }
+                            reader.close();
+
+                            JSONObject jsonResponse = new JSONObject(response.toString());
+
+                            saveLoginData(context, jsonResponse, email, password);
+
+                            callback.onLoginResult(true);
+                        } else {
+                            callback.onLoginResult(false);
+                        }
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    // Jika terjadi error, panggil callback dengan false
                     callback.onLoginResult(false);
                 }
             }
         });
+    }
+
+    private static void saveLoginData(Context context, JSONObject jsonResponse, String email, String password) {
+        try {
+            SharedPreferences sharedPref = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+
+            editor.putString("name", jsonResponse.getString("name"));
+            editor.putString("email", jsonResponse.getString("email"));
+            editor.putString("password", password);
+            editor.putInt("jml_baner", jsonResponse.getInt("jml_baner"));
+            editor.putInt("ReLoadBaner", jsonResponse.getInt("ReLoadBaner"));
+            editor.putInt("TimerBaner", jsonResponse.getInt("TimerBaner"));
+            editor.putInt("ReLoadInata", jsonResponse.getInt("ReLoadInata"));
+            editor.putInt("jml_inata", jsonResponse.getInt("jml_inata"));
+            editor.putInt("TimerInata", jsonResponse.getInt("TimerInata"));
+            editor.putInt("isClearCache", jsonResponse.getInt("isClearCache"));
+            editor.putInt("isVPNProtection", jsonResponse.getInt("isVPNProtection"));
+            editor.putInt("isTestAds", jsonResponse.getInt("isTestAds"));
+            editor.putInt("isRotation", jsonResponse.getInt("isRotation"));
+            editor.putInt("isMixadstype", jsonResponse.getInt("isMixadstype"));
+            editor.putInt("isIndoprot", jsonResponse.getInt("isIndoprot"));
+            editor.putInt("isKeepgoing", jsonResponse.getInt("isKeepgoing"));
+            editor.putInt("isAcakSponsor", jsonResponse.getInt("isAcakSponsor"));
+            editor.putInt("maxsuccess", jsonResponse.getInt("maxsuccess"));
+            editor.putInt("maxfail", jsonResponse.getInt("maxfail"));
+
+            saveJSONArrayToPreferences(editor, "Iklan_Layar_Pembuka_Aplikasi", jsonResponse.optJSONArray("Iklan_Layar_Pembuka_Aplikasi"));
+            saveJSONArrayToPreferences(editor, "Iklan_Banner_Adaptif", jsonResponse.optJSONArray("Iklan_Banner_Adaptif"));
+            saveJSONArrayToPreferences(editor, "Iklan_Banner_Ukuran_Tetap", jsonResponse.optJSONArray("Iklan_Banner_Ukuran_Tetap"));
+            saveJSONArrayToPreferences(editor, "Iklan_Interstisial", jsonResponse.optJSONArray("Iklan_Interstisial"));
+            saveJSONArrayToPreferences(editor, "Iklan_Iklan_Reward", jsonResponse.optJSONArray("Iklan_Iklan_Reward"));
+            saveJSONArrayToPreferences(editor, "Iklan_Interstisial_Reward", jsonResponse.optJSONArray("Iklan_Interstisial_Reward"));
+            saveJSONArrayToPreferences(editor, "Iklan_Native", jsonResponse.optJSONArray("Iklan_Native"));
+            saveJSONArrayToPreferences(editor, "Iklan_Video_Native", jsonResponse.optJSONArray("Iklan_Video_Native"));
+
+            editor.apply();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void saveJSONArrayToPreferences(SharedPreferences.Editor editor, String key, JSONArray jsonArray) {
@@ -216,9 +184,6 @@ public class AuthManager {
                 }
             }
             editor.putStringSet(key, set);
-        } else {
-            editor.remove(key); // Remove key if JSONArray is null
         }
     }
-
 }
