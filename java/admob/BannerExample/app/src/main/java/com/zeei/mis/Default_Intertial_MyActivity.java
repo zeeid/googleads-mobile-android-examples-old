@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Main Activity. Inflates main activity xml. */
 @SuppressLint("SetTextI18n")
-public class MyActivity extends AppCompatActivity {
+public class Default_Intertial_MyActivity extends AppCompatActivity {
 
     // Check your logcat output for the test device hashed ID e.g.
     // "Use RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("ABCDEF012345"))
@@ -129,10 +129,10 @@ public class MyActivity extends AppCompatActivity {
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
                         // The mInterstitialAd reference will be null until
                         // an ad is loaded.
-                        MyActivity.this.interstitialAd = interstitialAd;
+                        Default_Intertial_MyActivity.this.interstitialAd = interstitialAd;
                         adIsLoading = false;
                         Log.i(TAG, "onAdLoaded");
-                        Toast.makeText(MyActivity.this, "onAdLoaded()", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Default_Intertial_MyActivity.this, "onAdLoaded()", Toast.LENGTH_SHORT).show();
                         interstitialAd.setFullScreenContentCallback(
                                 new FullScreenContentCallback() {
                                     @Override
@@ -140,7 +140,7 @@ public class MyActivity extends AppCompatActivity {
                                         // Called when fullscreen content is dismissed.
                                         // Make sure to set your reference to null so you don't
                                         // show it a second time.
-                                        MyActivity.this.interstitialAd = null;
+                                        Default_Intertial_MyActivity.this.interstitialAd = null;
                                         Log.d("TAG", "The ad was dismissed.");
                                     }
 
@@ -149,7 +149,7 @@ public class MyActivity extends AppCompatActivity {
                                         // Called when fullscreen content failed to show.
                                         // Make sure to set your reference to null so you don't
                                         // show it a second time.
-                                        MyActivity.this.interstitialAd = null;
+                                        Default_Intertial_MyActivity.this.interstitialAd = null;
                                         Log.d("TAG", "The ad failed to show.");
                                     }
 
@@ -176,7 +176,7 @@ public class MyActivity extends AppCompatActivity {
                                         loadAdError.getCode(),
                                         loadAdError.getMessage());
                         Toast.makeText(
-                                        MyActivity.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT)
+                                        Default_Intertial_MyActivity.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT)
                                 .show();
                     }
                 });

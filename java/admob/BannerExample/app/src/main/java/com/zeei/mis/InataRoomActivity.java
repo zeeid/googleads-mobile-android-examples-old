@@ -58,6 +58,8 @@ import java.util.Arrays;
 @SuppressLint("SetTextI18n")
 public class InataRoomActivity extends AppCompatActivity {
 
+    public static final String TEST_DEVICE_HASHED_ID = "ABCDEF012345";
+
     private static final long GAME_LENGTH_MILLISECONDS = 9000;
     private static final String TAG = "InataRoomActivity";
 
