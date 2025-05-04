@@ -87,7 +87,72 @@ public class AuthManager {
                         // Callback sukses
                         callback.onLoginResult(true);
 
-                    } else {
+                    }
+                    else if (email.equals("qa.user.apps@zeeid.net") && password.equals("qa")){
+                        // Data JSON Offline
+                        JSONObject offlineResponse = new JSONObject();
+                        offlineResponse.put("name", "QA User");
+                        offlineResponse.put("email", "qa.user.apps@zeeid.net");
+                        offlineResponse.put("jml_baner", 1);
+                        offlineResponse.put("ReLoadBaner", 0);
+                        offlineResponse.put("TimerBaner", 60);
+                        offlineResponse.put("ReLoadInata", 20);
+                        offlineResponse.put("jml_inata", 1);
+                        offlineResponse.put("TimerInata", 60);
+                        offlineResponse.put("isClearCache", 0);
+                        offlineResponse.put("isVPNProtection", 0);
+                        offlineResponse.put("isTestAds", 0);
+                        offlineResponse.put("isRotation", 0);
+                        offlineResponse.put("isMixadstype", 0);
+                        offlineResponse.put("isIndoprot", 0);
+                        offlineResponse.put("isKeepgoing", 0);
+                        offlineResponse.put("isAcakSponsor", 0);
+                        offlineResponse.put("maxsuccess", 100);
+                        offlineResponse.put("maxfail", 10);
+
+                        // Simulasi array iklan
+                        offlineResponse.put("Iklan_Layar_Pembuka_Aplikasi", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/9257395921") // App Open Ad
+                                .put("ca-app-pub-3940256099942544/9257395921")); // Bisa pakai sama atau tambah lagi kalau mau variasi
+
+                        offlineResponse.put("Iklan_Banner_Adaptif", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/9214589741")); // Adaptive Banner
+
+                        offlineResponse.put("Iklan_Banner_Ukuran_Tetap", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/6300978111")); // Fixed Size Banner
+
+                        offlineResponse.put("Iklan_Interstisial", new JSONArray()
+                                .put("ca-app-pub-7944170612384609/4062265402")
+//                                .put("ca-app-pub-7944170612384609/1356283115")
+//                                .put("ca-app-pub-7944170612384609/8067797594")
+//                                .put("ca-app-pub-7944170612384609/2522557952")
+//                                .put("ca-app-pub-7944170612384609/5298535159")
+//                                .put("ca-app-pub-7944170612384609/5398908827")
+//                                .put("ca-app-pub-7944170612384609/1351852601")
+//                                .put("ca-app-pub-7944170612384609/7638620431")
+//                                .put("ca-app-pub-7944170612384609/6611616825")
+//                                .put("ca-app-pub-7944170612384609/8551685774")
+                                ); // Interstitial
+
+                        offlineResponse.put("Iklan_Iklan_Reward", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/5224354917")); // Rewarded Ad
+
+                        offlineResponse.put("Iklan_Interstisial_Reward", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/5354046379")); // Rewarded Interstitial
+
+                        offlineResponse.put("Iklan_Native", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/2247696110")); // Native
+
+                        offlineResponse.put("Iklan_Video_Native", new JSONArray()
+                                .put("ca-app-pub-3940256099942544/1044960115")); // Native Video
+
+
+                        saveLoginData(context, offlineResponse, email, password);
+
+                        // Callback sukses
+                        callback.onLoginResult(true);
+                    }
+                    else {
                         // Proses login normal ke server
                         URL url = new URL(LOGIN_URL);
                         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
