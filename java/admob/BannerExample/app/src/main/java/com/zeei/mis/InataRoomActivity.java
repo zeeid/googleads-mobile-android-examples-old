@@ -417,7 +417,7 @@ public class InataRoomActivity extends AppCompatActivity {
     }
 
     @Override
-            public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         View menuItemView = findViewById(item.getItemId());
         PopupMenu popup = new PopupMenu(this, menuItemView);
         popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
@@ -495,18 +495,24 @@ public class InataRoomActivity extends AppCompatActivity {
 
     private void initializeMobileAdsSdk() {
         if (isMobileAdsInitializeCalled.getAndSet(true)) {
-          return;
+            return;
         }
 
-        new Thread(
-        () -> {
-            // Initialize the Google Mobile Ads SDK on a background thread.
-            MobileAds.initialize(this, initializationStatus -> {});
+        // Set your test devices.
+        MobileAds.setRequestConfiguration(
+                new RequestConfiguration.Builder()
+                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
+                        .build());
 
-            // Load an ad on the main thread.
-            runOnUiThread(() -> loadAd());
-        })
-        .start();
+        new Thread(
+                () -> {
+                    // Initialize the Google Mobile Ads SDK on a background thread.
+                    MobileAds.initialize(this, initializationStatus -> {});
+
+                    // Load an ad on the main thread.
+                    runOnUiThread(() -> loadAd());
+                })
+                .start();
     }
 
     public void countDownTimeAR(){
