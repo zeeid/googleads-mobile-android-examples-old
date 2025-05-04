@@ -1,4 +1,4 @@
-package com.mubaraq.managementsistem;
+package com.zeei.mis;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,15 +16,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.mubaraq.managementsistem.data.FetchGeoIp;
-import com.mubaraq.managementsistem.login.AuthManager;
+import com.zeei.mis.data.FetchGeoIp;
+import com.zeei.mis.login.AuthManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,10 +1,10 @@
-package com.mubaraq.managementsistem.data;
+package com.zeei.mis.data;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.mubaraq.managementsistem.MainActivity;
+import com.zeei.mis.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;

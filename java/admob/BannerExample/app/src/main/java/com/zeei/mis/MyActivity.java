@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.mubaraq.managementsistem;
+package com.zeei.mis;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;

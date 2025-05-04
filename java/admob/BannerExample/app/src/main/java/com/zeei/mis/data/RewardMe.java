@@ -1,23 +1,33 @@
-package com.mubaraq.managementsistem.data;
+package com.zeei.mis.data;
 
-
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 
+public class RewardMe {
+    public static final String KEYWORD="keyword",
+            AUTORELOAD="autoreload",
+            AUTOCLOSEAD="autoclose",
+            DURATIONRELOAD="duration",
+            DURATIONCLOSE="close",
+            DATE="date",
+            GAGAL="gagal",
+            JMLREQUEST="jmlrequest",
+            BERHASIL="berhasil",
+            OPEN="open",
+            RATE="rate",
+            IMPRESSED="impress",
+            SHOW="show";
 
-public class VARIABELS {
-
-    public static String getString(String key, Context context,String defaults) {
+    public static String getString(String key, Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getString(key, defaults);
+        return preferences.getString(key, "unknow");
     }
-    public static int getInteger(String key, Context context,int valueDef) {
+    public static int getInteger(String key, Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getInt(key, valueDef);
+        return preferences.getInt(key, 0);
     }
     @NonNull
     public static Boolean getBool(String key, Context context) {
@@ -25,28 +35,24 @@ public class VARIABELS {
         return preferences.getBoolean(key, false);
     }
 
-    @SuppressLint("ApplySharedPref")
-    public static void saveString(String key, String value, Context context){
+    public static void saveString(String key,String value,Context context){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(key, value);
         editor.commit();
     }
-    @SuppressLint("ApplySharedPref")
     public static void saveInteger(String key,Integer value,Context context){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(key,value);
         editor.commit();
     }
-    @SuppressLint("ApplySharedPref")
     public static void saveBool(String key,Boolean value,Context context){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(key, value);
         editor.commit();
     }
-    @SuppressLint("ApplySharedPref")
     public static void saveFloat(String key,Float value,Context context){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();

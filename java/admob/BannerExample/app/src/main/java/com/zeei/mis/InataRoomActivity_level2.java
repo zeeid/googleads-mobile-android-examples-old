@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mubaraq.managementsistem;
+package com.zeei.mis;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -41,7 +41,7 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-import com.mubaraq.managementsistem.data.InterstialMe;
+import com.zeei.mis.data.InterstialMe;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;

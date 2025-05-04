@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace 'com.mubaraq.managementsistem'
+    namespace 'com.zeei.mis'
     compileSdkVersion 34
     defaultConfig {
-        applicationId "com.mubaraq.managementsistem"
+        applicationId "com.zeei.mis"
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 6
-        versionName "6.0"
+        versionCode 1
+        versionName "1.0"
         multiDexEnabled true
     }
     buildTypes {

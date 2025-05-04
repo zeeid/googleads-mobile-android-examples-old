@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mubaraq.managementsistem;
+package com.zeei.mis;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -41,7 +41,7 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-import com.mubaraq.managementsistem.data.InterstialMe;
+import com.zeei.mis.data.InterstialMe;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -54,7 +54,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressLint("SetTextI18n")
-public class InataRoomActivity_level3 extends AppCompatActivity {
+public class InataRoomActivity_level1 extends AppCompatActivity {
 
     private static final long GAME_LENGTH_MILLISECONDS = 9000;
     private static final String TAG = "InataRoomActivity";
@@ -122,7 +122,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                 randomAdCode = layarPembukaAplikasiArray[randomIndex];
             }else{
                 if(layarPembukaAplikasiArray.length > 1){
-                    randomAdCode = layarPembukaAplikasiArray[3];
+                    randomAdCode = layarPembukaAplikasiArray[1];
                 }else{
                     randomAdCode = layarPembukaAplikasiArray[0];
                 }
@@ -137,7 +137,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_room_inata_level3);
+        setContentView(R.layout.activity_room_inata_level1);
         viewBinds();
         CekDateUP();
         data();
@@ -232,11 +232,11 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 MobileAds.openAdInspector(
-                        InataRoomActivity_level3.this,
+                        InataRoomActivity_level1.this,
                         error -> {
                             // Error will be non-null if ad inspector closed due to an error.
                             if (error != null) {
-                                Toast.makeText(InataRoomActivity_level3.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(InataRoomActivity_level1.this, error.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
             }
@@ -245,7 +245,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
 
     public void loadAd() {
         requestot++;
-        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot, InataRoomActivity_level3.this);
+        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot, InataRoomActivity_level1.this);
         dataC();
         logprogram.setText("Log : Memuat iklan interstitial");
         if (adIsLoading || interstitialAd != null) {
@@ -262,12 +262,12 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
               public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
                 // The mInterstitialAd reference will be null until
                 // an ad is loaded.
-                InataRoomActivity_level3.this.interstitialAd = interstitialAd;
+                InataRoomActivity_level1.this.interstitialAd = interstitialAd;
                 adIsLoading = false;
 
-                Toast.makeText(InataRoomActivity_level3.this, "onAdLoaded()", Toast.LENGTH_SHORT).show();
+                Toast.makeText(InataRoomActivity_level1.this, "onAdLoaded()", Toast.LENGTH_SHORT).show();
                   berhasilt++;
-                  InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt, InataRoomActivity_level3.this);
+                  InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt, InataRoomActivity_level1.this);
                   dataC();
                   logprogram.setText("Log : Berhasil Memuat iklan interstitial");
 
@@ -279,7 +279,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                             // Called when a click is recorded for an ad.
                             logprogram.setText("Log : Ad was clicked.");
                             cik++;
-                            InterstialMe.saveInteger(InterstialMe.OPEN,cik, InataRoomActivity_level3.this);
+                            InterstialMe.saveInteger(InterstialMe.OPEN,cik, InataRoomActivity_level1.this);
                             dataC();
                         }
 
@@ -288,7 +288,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                         // Called when fullscreen content is dismissed.
                         // Make sure to set your reference to null so you don't
                         // show it a second time.
-                          InataRoomActivity_level3.this.interstitialAd = null;
+                          InataRoomActivity_level1.this.interstitialAd = null;
                           logprogram.setText("Log : The ad was dismissed.");
                       }
 
@@ -297,7 +297,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                         // Called when fullscreen content failed to show.
                         // Make sure to set your reference to null so you don't
                         // show it a second time.
-                          InataRoomActivity_level3.this.interstitialAd = null;
+                          InataRoomActivity_level1.this.interstitialAd = null;
                           logprogram.setText("Log : The ad failed to show.");
                       }
 
@@ -306,7 +306,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                             // Called when an impression is recorded for an ad.
                             logprogram.setText("Log : Ad recorded an impression.");
                             impressed++;
-                            InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed, InataRoomActivity_level3.this);
+                            InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed, InataRoomActivity_level1.this);
                             dataC();
 
                             if(autoclose) {
@@ -319,7 +319,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                         // Called when fullscreen content is shown.
                             logprogram.setText("Log : The ad was shown.");
                         show++;
-                        InterstialMe.saveInteger(InterstialMe.SHOW,show, InataRoomActivity_level3.this);
+                        InterstialMe.saveInteger(InterstialMe.SHOW,show, InataRoomActivity_level1.this);
                         dataC();
                       }
                     });
@@ -334,7 +334,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                 adIsLoading = false;
 
                   gagalt++;
-                  InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt, InataRoomActivity_level3.this);
+                  InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt, InataRoomActivity_level1.this);
                   dataC();
 
                 String error =
@@ -344,7 +344,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                         loadAdError.getDomain(),
                         loadAdError.getCode(),
                         loadAdError.getMessage());
-                Toast.makeText(InataRoomActivity_level3.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(InataRoomActivity_level1.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT).show();
 
                   logprogram.setText("Log : Error "+error);
                   if (keepgoing){
@@ -353,7 +353,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                       }
                   }else{
                       countDownTimer.cancel();
-                      Toast.makeText(InataRoomActivity_level3.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
+                      Toast.makeText(InataRoomActivity_level1.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
                   }
               }
             });
@@ -526,10 +526,10 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                         Intent intent;
                         if (mixbanerinter) {
                             // Open BananaFixedActivity (You might want to change this to BananaFixedActivity)
-                            intent = new Intent(InataRoomActivity_level3.this, InataRoomActivity_level3.class);
+                            intent = new Intent(InataRoomActivity_level1.this, InataRoomActivity_level1.class);
                         } else {
                             // Open InataRoomActivity (stays the same)
-                            intent = new Intent(InataRoomActivity_level3.this, InataRoomActivity_level1.class);
+                            intent = new Intent(InataRoomActivity_level1.this, InataRoomActivity_level2.class);
                         }
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
@@ -620,13 +620,13 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
         }
     }
     public void resetResult(){
-        InterstialMe.saveInteger(InterstialMe.SHOW,0, InataRoomActivity_level3.this);
-        InterstialMe.saveInteger(InterstialMe.GAGAL,0, InataRoomActivity_level3.this);
-        InterstialMe.saveInteger(InterstialMe.BERHASIL,0, InataRoomActivity_level3.this);
-        InterstialMe.saveInteger(InterstialMe.OPEN,0, InataRoomActivity_level3.this);
-        InterstialMe.saveInteger(InterstialMe.IMPRESSED,0, InataRoomActivity_level3.this);
+        InterstialMe.saveInteger(InterstialMe.SHOW,0, InataRoomActivity_level1.this);
+        InterstialMe.saveInteger(InterstialMe.GAGAL,0, InataRoomActivity_level1.this);
+        InterstialMe.saveInteger(InterstialMe.BERHASIL,0, InataRoomActivity_level1.this);
+        InterstialMe.saveInteger(InterstialMe.OPEN,0, InataRoomActivity_level1.this);
+        InterstialMe.saveInteger(InterstialMe.IMPRESSED,0, InataRoomActivity_level1.this);
         InterstialMe.saveString(InterstialMe.RATE,"0",this);
-        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,0, InataRoomActivity_level3.this);
+        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,0, InataRoomActivity_level1.this);
         data();
         CekDateUP();
     }

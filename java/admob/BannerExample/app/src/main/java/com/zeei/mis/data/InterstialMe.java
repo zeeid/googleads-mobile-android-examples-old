@@ -1,4 +1,4 @@
-package com.mubaraq.managementsistem.data;
+package com.zeei.mis.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
