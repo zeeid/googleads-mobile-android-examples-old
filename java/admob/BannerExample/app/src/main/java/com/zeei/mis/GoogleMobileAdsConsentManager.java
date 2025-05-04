@@ -31,16 +31,17 @@ import com.google.android.ump.UserMessagingPlatform;
  * management platform) as one solution to capture consent for users in GDPR impacted countries.
  * This is an example and you can choose another consent management platform to capture consent.
  */
+@SuppressWarnings("NonFinalStaticField")
 public class GoogleMobileAdsConsentManager {
   private static GoogleMobileAdsConsentManager instance;
   private final ConsentInformation consentInformation;
 
-  /** Private constructor */
+  /** Private constructor. */
   private GoogleMobileAdsConsentManager(Context context) {
     this.consentInformation = UserMessagingPlatform.getConsentInformation(context);
   }
 
-  /** Public constructor */
+  /** Public constructor. */
   public static GoogleMobileAdsConsentManager getInstance(Context context) {
     if (instance == null) {
       instance = new GoogleMobileAdsConsentManager(context);
@@ -62,7 +63,7 @@ public class GoogleMobileAdsConsentManager {
   /** Helper variable to determine if the privacy options form is required. */
   public boolean isPrivacyOptionsRequired() {
     return consentInformation.getPrivacyOptionsRequirementStatus()
-        == PrivacyOptionsRequirementStatus.REQUIRED;
+            == PrivacyOptionsRequirementStatus.REQUIRED;
   }
 
   /**
@@ -70,35 +71,35 @@ public class GoogleMobileAdsConsentManager {
    * consent form if necessary.
    */
   public void gatherConsent(
-      Activity activity, OnConsentGatheringCompleteListener onConsentGatheringCompleteListener) {
+          Activity activity, OnConsentGatheringCompleteListener onConsentGatheringCompleteListener) {
     // For testing purposes, you can force a DebugGeography of EEA or NOT_EEA.
     ConsentDebugSettings debugSettings =
-        new ConsentDebugSettings.Builder(activity)
-            // .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
-            .addTestDeviceHashedId(MyActivity.TEST_DEVICE_HASHED_ID)
-            .build();
+            new ConsentDebugSettings.Builder(activity)
+                    // .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+                    .addTestDeviceHashedId(MyActivity.TEST_DEVICE_HASHED_ID)
+                    .build();
 
     ConsentRequestParameters params =
-        new ConsentRequestParameters.Builder().setConsentDebugSettings(debugSettings).build();
+            new ConsentRequestParameters.Builder().setConsentDebugSettings(debugSettings).build();
 
     // Requesting an update to consent information should be called on every app launch.
     consentInformation.requestConsentInfoUpdate(
-        activity,
-        params,
-        () ->
-            UserMessagingPlatform.loadAndShowConsentFormIfRequired(
-                activity,
-                formError -> {
-                  // Consent has been gathered.
-                  onConsentGatheringCompleteListener.consentGatheringComplete(formError);
-                }),
-        requestConsentError ->
-            onConsentGatheringCompleteListener.consentGatheringComplete(requestConsentError));
+            activity,
+            params,
+            () ->
+                    UserMessagingPlatform.loadAndShowConsentFormIfRequired(
+                            activity,
+                            formError -> {
+                              // Consent has been gathered.
+                              onConsentGatheringCompleteListener.consentGatheringComplete(formError);
+                            }),
+            requestConsentError ->
+                    onConsentGatheringCompleteListener.consentGatheringComplete(requestConsentError));
   }
 
   /** Helper method to call the UMP SDK method to present the privacy options form. */
   public void showPrivacyOptionsForm(
-      Activity activity, OnConsentFormDismissedListener onConsentFormDismissedListener) {
+          Activity activity, OnConsentFormDismissedListener onConsentFormDismissedListener) {
     UserMessagingPlatform.showPrivacyOptionsForm(activity, onConsentFormDismissedListener);
   }
 }
