@@ -39,7 +39,7 @@ public class AuthManager {
                         offlineResponse.put("jml_baner", 1);
                         offlineResponse.put("ReLoadBaner", 0);
                         offlineResponse.put("TimerBaner", 60);
-                        offlineResponse.put("ReLoadInata", 20);
+                        offlineResponse.put("ReLoadInata", 1);
                         offlineResponse.put("jml_inata", 1);
                         offlineResponse.put("TimerInata", 60);
                         offlineResponse.put("isClearCache", 0);

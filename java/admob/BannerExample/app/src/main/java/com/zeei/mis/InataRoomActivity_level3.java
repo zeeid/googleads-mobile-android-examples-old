@@ -39,6 +39,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.zeei.mis.data.InterstialMe;
@@ -52,12 +53,15 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Arrays;
 
 @SuppressLint("SetTextI18n")
 public class InataRoomActivity_level3 extends AppCompatActivity {
 
+    public static final String TEST_DEVICE_HASHED_ID = "ABCDEF012345";
+
     private static final long GAME_LENGTH_MILLISECONDS = 9000;
-    private static final String TAG = "InataRoomActivity";
+    private static final String TAG = "InataRoomActivity_level3";
 
     private final AtomicBoolean isMobileAdsInitializeCalled = new AtomicBoolean(false);
     private GoogleMobileAdsConsentManager googleMobileAdsConsentManager;
@@ -116,6 +120,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
         if (layarPembukaAplikasiArray.length > 0) {
             Random random = new Random();
             int randomIndex = random.nextInt(layarPembukaAplikasiArray.length);
+
             AcakSponsor     = (sharedPref.getInt("isAcakSponsor", 0) == 1 );
 
             if (AcakSponsor){
@@ -179,6 +184,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
             return;
         }
 
+        // Log the Mobile Ads SDK version.
         Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
 
         googleMobileAdsConsentManager =
@@ -245,118 +251,121 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
 
     public void loadAd() {
         requestot++;
-        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot, InataRoomActivity_level3.this);
+        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,InataRoomActivity_level3.this);
         dataC();
         logprogram.setText("Log : Memuat iklan interstitial");
+        // Request a new ad if one isn't already loaded.
         if (adIsLoading || interstitialAd != null) {
-          return;
+            return;
         }
         adIsLoading = true;
         AdRequest adRequest = new AdRequest.Builder().build();
         InterstitialAd.load(
-            this,
-            GetUnitID(),
-            adRequest,
-            new InterstitialAdLoadCallback() {
-              @Override
-              public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                // The mInterstitialAd reference will be null until
-                // an ad is loaded.
-                InataRoomActivity_level3.this.interstitialAd = interstitialAd;
-                adIsLoading = false;
+                this,
+                GetUnitID(),
+                adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        // The mInterstitialAd reference will be null until
+                        // an ad is loaded.
+                        InataRoomActivity_level3.this.interstitialAd = interstitialAd;
+                        adIsLoading = false;
+                        Log.i(TAG, "onAdLoaded");
+                        Toast.makeText(InataRoomActivity_level3.this, "onAdLoaded()", Toast.LENGTH_SHORT).show();
+                        berhasilt++;
+                        InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity_level3.this);
+                        dataC();
+                        logprogram.setText("Log : Berhasil Memuat iklan interstitial");
+                        interstitialAd.setFullScreenContentCallback(
+                                new FullScreenContentCallback() {
+                                    @Override
+                                    public void onAdClicked() {
+                                        // Called when a click is recorded for an ad.
+                                        logprogram.setText("Log : Ad was clicked.");
+                                        cik++;
+                                        InterstialMe.saveInteger(InterstialMe.OPEN,cik,InataRoomActivity_level3.this);
+                                        dataC();
+                                    }
 
-                Toast.makeText(InataRoomActivity_level3.this, "onAdLoaded()", Toast.LENGTH_SHORT).show();
-                  berhasilt++;
-                  InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt, InataRoomActivity_level3.this);
-                  dataC();
-                  logprogram.setText("Log : Berhasil Memuat iklan interstitial");
+                                    @Override
+                                    public void onAdDismissedFullScreenContent() {
+                                        // Called when fullscreen content is dismissed.
+                                        // Make sure to set your reference to null so you don't
+                                        // show it a second time.
+                                        InataRoomActivity_level3.this.interstitialAd = null;
+                                        logprogram.setText("Log : The ad was dismissed.");
+                                        Log.d("TAG", "The ad was dismissed.");
+                                    }
 
-                interstitialAd.setFullScreenContentCallback(
-                    new FullScreenContentCallback() {
+                                    @Override
+                                    public void onAdFailedToShowFullScreenContent(AdError adError) {
+                                        // Called when fullscreen content failed to show.
+                                        // Make sure to set your reference to null so you don't
+                                        // show it a second time.
+                                        InataRoomActivity_level3.this.interstitialAd = null;
+                                        logprogram.setText("Log : The ad failed to show.");
+                                        Log.d("TAG", "The ad failed to show.");
+                                    }
 
-                        @Override
-                        public void onAdClicked() {
-                            // Called when a click is recorded for an ad.
-                            logprogram.setText("Log : Ad was clicked.");
-                            cik++;
-                            InterstialMe.saveInteger(InterstialMe.OPEN,cik, InataRoomActivity_level3.this);
-                            dataC();
-                        }
+                                    @Override
+                                    public void onAdImpression() {
+                                        // Called when an impression is recorded for an ad.
+                                        logprogram.setText("Log : Ad recorded an impression.");
+                                        impressed++;
+                                        InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed,InataRoomActivity_level3.this);
+                                        dataC();
 
-                      @Override
-                      public void onAdDismissedFullScreenContent() {
-                        // Called when fullscreen content is dismissed.
-                        // Make sure to set your reference to null so you don't
-                        // show it a second time.
-                          InataRoomActivity_level3.this.interstitialAd = null;
-                          logprogram.setText("Log : The ad was dismissed.");
-                      }
+                                        if(autoclose) {
+                                            countDownTimeAR();
+                                        }
+                                    }
 
-                      @Override
-                      public void onAdFailedToShowFullScreenContent(AdError adError) {
-                        // Called when fullscreen content failed to show.
-                        // Make sure to set your reference to null so you don't
-                        // show it a second time.
-                          InataRoomActivity_level3.this.interstitialAd = null;
-                          logprogram.setText("Log : The ad failed to show.");
-                      }
+                                    @Override
+                                    public void onAdShowedFullScreenContent() {
+                                        // Called when fullscreen content is shown.
+                                        Log.d("TAG", "The ad was shown.");
+                                        logprogram.setText("Log : The ad was shown.");
+                                        show++;
+                                        InterstialMe.saveInteger(InterstialMe.SHOW,show,InataRoomActivity_level3.this);
+                                        dataC();
+                                    }
+                                });
+                    }
 
-                        @Override
-                        public void onAdImpression() {
-                            // Called when an impression is recorded for an ad.
-                            logprogram.setText("Log : Ad recorded an impression.");
-                            impressed++;
-                            InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed, InataRoomActivity_level3.this);
-                            dataC();
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        // Handle the error
+                        Log.i(TAG, loadAdError.getMessage());
+                        interstitialAd = null;
+                        adIsLoading = false;
 
+                        gagalt++;
+                        InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity_level3.this);
+                        dataC();
+
+                        String error =
+                                String.format(
+                                        java.util.Locale.US,
+                                        "domain: %s, code: %d, message: %s",
+                                        loadAdError.getDomain(),
+                                        loadAdError.getCode(),
+                                        loadAdError.getMessage());
+                        Toast.makeText(
+                                        InataRoomActivity_level3.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT)
+                                .show();
+
+                        logprogram.setText("Log : Error "+error);
+                        if (keepgoing){
                             if(autoclose) {
                                 countDownTimeAR();
                             }
+                        }else{
+                            countDownTimer.cancel();
+                            Toast.makeText(InataRoomActivity_level3.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
                         }
-
-                        @Override
-                      public void onAdShowedFullScreenContent() {
-                        // Called when fullscreen content is shown.
-                            logprogram.setText("Log : The ad was shown.");
-                        show++;
-                        InterstialMe.saveInteger(InterstialMe.SHOW,show, InataRoomActivity_level3.this);
-                        dataC();
-                      }
-                    });
-              }
-
-              @SuppressLint("SuspiciousIndentation")
-              @Override
-              public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                // Handle the error
-                Log.i(TAG, loadAdError.getMessage());
-                interstitialAd = null;
-                adIsLoading = false;
-
-                  gagalt++;
-                  InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt, InataRoomActivity_level3.this);
-                  dataC();
-
-                String error =
-                    String.format(
-                        Locale.US,
-                        "domain: %s, code: %d, message: %s",
-                        loadAdError.getDomain(),
-                        loadAdError.getCode(),
-                        loadAdError.getMessage());
-                Toast.makeText(InataRoomActivity_level3.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT).show();
-
-                  logprogram.setText("Log : Error "+error);
-                  if (keepgoing){
-                      if(autoclose) {
-                          countDownTimeAR();
-                      }
-                  }else{
-                      countDownTimer.cancel();
-                      Toast.makeText(InataRoomActivity_level3.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
-                  }
-              }
-            });
+                    }
+                });
     }
 
     private void createTimer(final long milliseconds) {
@@ -410,7 +419,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
     }
 
     @Override
-            public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         View menuItemView = findViewById(item.getItemId());
         PopupMenu popup = new PopupMenu(this, menuItemView);
         popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
@@ -471,7 +480,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
 
     private void resumeGame() {
         if (gameOver || !gamePaused) {
-          return;
+            return;
         }
         // Create a new timer for the correct length.
         gamePaused = false;
@@ -480,7 +489,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
 
     private void pauseGame() {
         if (gameOver || gamePaused) {
-          return;
+            return;
         }
         countDownTimer.cancel();
         gamePaused = true;
@@ -488,18 +497,24 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
 
     private void initializeMobileAdsSdk() {
         if (isMobileAdsInitializeCalled.getAndSet(true)) {
-          return;
+            return;
         }
 
-        new Thread(
-        () -> {
-            // Initialize the Google Mobile Ads SDK on a background thread.
-            MobileAds.initialize(this, initializationStatus -> {});
+        // Set your test devices.
+        MobileAds.setRequestConfiguration(
+                new RequestConfiguration.Builder()
+                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
+                        .build());
 
-            // Load an ad on the main thread.
-            runOnUiThread(() -> loadAd());
-        })
-        .start();
+        new Thread(
+                () -> {
+                    // Initialize the Google Mobile Ads SDK on a background thread.
+                    MobileAds.initialize(this, initializationStatus -> {});
+
+                    // Load an ad on the main thread.
+                    runOnUiThread(() -> loadAd());
+                })
+                .start();
     }
 
     public void countDownTimeAR(){
@@ -515,6 +530,7 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
 
                 public void onFinish() {
                     if (autoclose) {
+                        onBackPressed();
                         // Close the current activity
                         finish();
 
@@ -528,8 +544,8 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
                             // Open BananaFixedActivity (You might want to change this to BananaFixedActivity)
                             intent = new Intent(InataRoomActivity_level3.this, InataRoomActivity_level3.class);
                         } else {
-                            // Open InataRoomActivity (stays the same)
-                            intent = new Intent(InataRoomActivity_level3.this, InataRoomActivity_level1.class);
+                            // Open InataRoomActivity_level3 (stays the same)
+                            intent = new Intent(InataRoomActivity_level3.this, InataRoomActivity.class);
                         }
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
@@ -620,13 +636,13 @@ public class InataRoomActivity_level3 extends AppCompatActivity {
         }
     }
     public void resetResult(){
-        InterstialMe.saveInteger(InterstialMe.SHOW,0, InataRoomActivity_level3.this);
-        InterstialMe.saveInteger(InterstialMe.GAGAL,0, InataRoomActivity_level3.this);
-        InterstialMe.saveInteger(InterstialMe.BERHASIL,0, InataRoomActivity_level3.this);
-        InterstialMe.saveInteger(InterstialMe.OPEN,0, InataRoomActivity_level3.this);
-        InterstialMe.saveInteger(InterstialMe.IMPRESSED,0, InataRoomActivity_level3.this);
+        InterstialMe.saveInteger(InterstialMe.SHOW,0,InataRoomActivity_level3.this);
+        InterstialMe.saveInteger(InterstialMe.GAGAL,0,InataRoomActivity_level3.this);
+        InterstialMe.saveInteger(InterstialMe.BERHASIL,0,InataRoomActivity_level3.this);
+        InterstialMe.saveInteger(InterstialMe.OPEN,0,InataRoomActivity_level3.this);
+        InterstialMe.saveInteger(InterstialMe.IMPRESSED,0,InataRoomActivity_level3.this);
         InterstialMe.saveString(InterstialMe.RATE,"0",this);
-        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,0, InataRoomActivity_level3.this);
+        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,0,InataRoomActivity_level3.this);
         data();
         CekDateUP();
     }
