@@ -73,14 +73,18 @@ public class GoogleMobileAdsConsentManager {
   public void gatherConsent(
           Activity activity, OnConsentGatheringCompleteListener onConsentGatheringCompleteListener) {
     // For testing purposes, you can force a DebugGeography of EEA or NOT_EEA.
-    ConsentDebugSettings debugSettings =
-            new ConsentDebugSettings.Builder(activity)
-                    // .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
-                    .addTestDeviceHashedId(MyActivity.TEST_DEVICE_HASHED_ID)
-                    .build();
+//    ConsentDebugSettings debugSettings =
+//            new ConsentDebugSettings.Builder(activity)
+//                    // .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+//                    .addTestDeviceHashedId(MyActivity.TEST_DEVICE_HASHED_ID)
+//                    .build();
+
+//    ConsentRequestParameters params =
+//            new ConsentRequestParameters.Builder().setConsentDebugSettings(debugSettings).build();
 
     ConsentRequestParameters params =
-            new ConsentRequestParameters.Builder().setConsentDebugSettings(debugSettings).build();
+            new ConsentRequestParameters.Builder().build(); // Tanpa debug settings
+
 
     // Requesting an update to consent information should be called on every app launch.
     consentInformation.requestConsentInfoUpdate(

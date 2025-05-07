@@ -197,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
         viewLayout();
         cekIp();
         setSystemTimeZoneByIP(MainActivity.this);
-//        checkPermissions();
 
         Button buttonInata = findViewById(R.id.buttoninata);
         buttonInata.setOnClickListener(new View.OnClickListener() {
@@ -207,48 +206,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        Button buttonRewad = findViewById(R.id.buttonreward);
-        buttonRewad.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent intent = new Intent(MainActivity.this, MenuReward.class);
-//                startActivity(intent);
-            }
-        });
-
-        Button buttonInataRewad = findViewById(R.id.buttoninatareward);
-        buttonInataRewad.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent intent = new Intent(MainActivity.this, MenuInataReward.class);
-//                startActivity(intent);
-            }
-        });
-
-        Button buttonBanana = findViewById(R.id.buttonBanana);
-        buttonBanana.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent intent = new Intent(MainActivity.this, MenuBananaAdaptive.class);
-//                startActivity(intent);
-            }
-        });
-
         Button buttonRefresh = findViewById(R.id.buttonRefresh);
         buttonRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 cekIp();
-            }
-        });
-
-        Button buttonSetting = findViewById(R.id.button3);
-        buttonSetting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent intent = new Intent(MainActivity.this, MenuSetting.class);
-//                startActivity(intent);
             }
         });
 
