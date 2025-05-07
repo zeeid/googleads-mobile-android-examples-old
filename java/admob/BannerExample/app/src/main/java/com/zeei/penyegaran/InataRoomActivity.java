@@ -601,9 +601,9 @@ public class InataRoomActivity extends AppCompatActivity {
             times.setText("");
         }
         if((sharedPref.getInt("ReLoadInata", 0) == 1 )){
-            close.setText("AUTO CLOSE AD ACTIVE ");
+            close.setText("AUTO CLOSE ACTIVE ");
         }else{
-            close.setText("AUTO CLOSE AD OFF");
+            close.setText("AUTO CLOSE OFF");
         }
 
         berhasil.setText("LOAD :"+berhasilt);
