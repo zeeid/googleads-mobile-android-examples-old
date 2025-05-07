@@ -1,4 +1,4 @@
-package com.zeei.mis.data;
+package com.zeei.penyegaran.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,12 +6,7 @@ import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 
-/**
- * Created by MBP on 1/28/18.
- */
-
-public class InterstialMe {
-
+public class RewardMe {
     public static final String KEYWORD="keyword",
             AUTORELOAD="autoreload",
             AUTOCLOSEAD="autoclose",
@@ -69,5 +64,4 @@ public class InterstialMe {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getFloat(key,0f);
     }
-
 }

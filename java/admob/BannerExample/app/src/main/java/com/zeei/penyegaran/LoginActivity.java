@@ -1,4 +1,4 @@
-package com.zeei.mis;
+package com.zeei.penyegaran;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.zeei.mis.login.AuthManager;
+import com.zeei.penyegaran.login.AuthManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;

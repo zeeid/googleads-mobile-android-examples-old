@@ -1,10 +1,10 @@
-package com.zeei.mis.data;
+package com.zeei.penyegaran.data;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.zeei.mis.MainActivity;
+import com.zeei.penyegaran.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;

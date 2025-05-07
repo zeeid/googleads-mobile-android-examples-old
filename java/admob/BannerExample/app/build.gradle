@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace 'com.zeei.mis'
+    namespace 'com.zeei.penyegaran'
     compileSdkVersion 34
     defaultConfig {
-        applicationId "com.zeei.mis"
+        applicationId "com.zeei.penyegaran"
         minSdkVersion 23
         targetSdkVersion 34
         versionCode 1

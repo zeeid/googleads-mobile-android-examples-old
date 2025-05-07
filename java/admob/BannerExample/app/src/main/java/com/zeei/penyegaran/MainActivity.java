@@ -1,4 +1,4 @@
-package com.zeei.mis;
+package com.zeei.penyegaran;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -20,8 +20,8 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.zeei.mis.data.FetchGeoIp;
-import com.zeei.mis.login.AuthManager;
+import com.zeei.penyegaran.data.FetchGeoIp;
+import com.zeei.penyegaran.login.AuthManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
