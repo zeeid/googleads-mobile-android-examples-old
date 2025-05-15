@@ -33,6 +33,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
+import com.unity3d.ads.metadata.MetaData;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -191,6 +193,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        MetaData gdprMetaData = new MetaData(this);
+        gdprMetaData.set("gdpr.consent", true);
+        gdprMetaData.commit();
+
+        MetaData ccpaMetaData = new MetaData(this);
+        ccpaMetaData.set("privacy.consent", true);
+        ccpaMetaData.commit();
+
 
         new GetAdvertisingIdTask(this).execute();
 
