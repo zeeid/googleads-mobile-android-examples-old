@@ -217,6 +217,17 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Button buttonInatamedatio = findViewById(R.id.buttoninatamedatio);
+        buttonInatamedatio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, InataRoomActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
         Button buttonRefresh = findViewById(R.id.buttonRefresh);
         buttonRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
