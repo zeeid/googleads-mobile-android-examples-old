@@ -134,7 +134,9 @@ public class AuthManager {
                                 ); // Interstitial
 
                         offlineResponse.put("Iklan_Iklan_Reward", new JSONArray()
-                                .put("ca-app-pub-3940256099942544/5224354917")); // Rewarded Ad
+                                .put("ca-app-pub-3940256099942544/5224354917")
+//                                .put("ca-app-pub-9781045687912585/5213621000")
+                        ); // Rewarded Ad
 
                         offlineResponse.put("Iklan_Interstisial_Reward", new JSONArray()
                                 .put("ca-app-pub-3940256099942544/5354046379")); // Rewarded Interstitial

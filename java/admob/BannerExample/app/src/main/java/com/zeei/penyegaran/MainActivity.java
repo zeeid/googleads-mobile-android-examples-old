@@ -227,6 +227,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button buttonhadiahroom = findViewById(R.id.buttonhadiahroom);
+        buttonhadiahroom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, RewardRoomActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         Button buttonRefresh = findViewById(R.id.buttonRefresh);
         buttonRefresh.setOnClickListener(new View.OnClickListener() {

@@ -11,13 +11,13 @@
 
     <string name="impossible_game" translatable="false">Impossible Game</string>
 
-    <string name="default_coin_text" translatable="false">Coins: 0</string>
-    <string name="watch_video_button_text" translatable="false">Watch Video for 10 additional coins</string>
+    <string name="default_coin_text" translatable="false">Duit: 0</string>
+    <string name="watch_video_button_text" translatable="false">Watch Video for 1 additional duit</string>
     <string name="retry_button_text" translatable="false">Retry</string>
 
     <plurals name="more_coins_text" translatable="false">
-        <item quantity="one">Watch an ad for %d more coin.</item>
-        <item quantity="other">Watch an ad for %d more coins.</item>
+        <item quantity="one">Watch an ad for %d more duit.</item>
+        <item quantity="other">Watch an ad for %d more duit.</item>
     </plurals>
 
     <string name="negative_button_text" translatable="false">No, thanks</string>
