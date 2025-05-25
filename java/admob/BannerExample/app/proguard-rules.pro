@@ -28,3 +28,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+# For Google Mobile Ads SDK
+-keep public class com.google.android.gms.ads.** {
+    public *;
+}
