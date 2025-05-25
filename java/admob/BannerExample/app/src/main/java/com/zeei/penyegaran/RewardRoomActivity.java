@@ -535,7 +535,7 @@ public class RewardRoomActivity extends AppCompatActivity {
                     public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
                         // Handle the reward.
                         Log.d("TAG", "The user earned the reward.");
-                        addCoins(coinCount);
+                        addCoins(1);
                     }
                 });
     }
