@@ -500,10 +500,10 @@ public class InataRoomActivity extends AppCompatActivity {
         }
 
         // Set your test devices.
-        MobileAds.setRequestConfiguration(
-                new RequestConfiguration.Builder()
-                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
-                        .build());
+//        MobileAds.setRequestConfiguration(
+//                new RequestConfiguration.Builder()
+//                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
+//                        .build());
 
         new Thread(
                 () -> {
