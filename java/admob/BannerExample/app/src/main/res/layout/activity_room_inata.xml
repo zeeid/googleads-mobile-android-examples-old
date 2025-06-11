@@ -197,7 +197,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
         android:layout_below="@+id/LinearLayoutAtas"
-        android:text="@string/impossible_game"
+        android:text="Imposible Game Level 0"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView

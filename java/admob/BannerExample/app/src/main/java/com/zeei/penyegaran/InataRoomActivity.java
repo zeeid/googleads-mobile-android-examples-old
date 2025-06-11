@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,8 +55,15 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Arrays;
 
+import com.unity3d.ads.IUnityAdsLoadListener;
+import com.unity3d.ads.IUnityAdsShowListener;
+import com.unity3d.ads.UnityAdsShowOptions;
+
+import com.unity3d.ads.IUnityAdsInitializationListener;
+import com.unity3d.ads.UnityAds;
+
 @SuppressLint("SetTextI18n")
-public class InataRoomActivity extends AppCompatActivity {
+public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsInitializationListener  {
 
     public static final String TEST_DEVICE_HASHED_ID = "ABCDEF012345";
 
@@ -74,13 +82,18 @@ public class InataRoomActivity extends AppCompatActivity {
 
 
     public final String RELOADE="reload";
-    public boolean reload=false,autoclose,autoreload,IsIndo;
+    public boolean reload=false,autoclose,autoreload,IsIndo, IsAdmob=true;
     public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor;
     public int maxsuccess = 1, maxfail = 1;
     public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60;
     public String ratess,AdsUnitID;
     Button sett;
     TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
+
+    private String unityGameID = "5855626";
+    private Boolean testMode = true;
+    private String adUnitId = "Interstitial_Android";
+
 
     @Override
     public void onBackPressed() {
@@ -138,6 +151,98 @@ public class InataRoomActivity extends AppCompatActivity {
 
         return randomAdCode;
     }
+
+
+    private IUnityAdsLoadListener loadListener = new IUnityAdsLoadListener() {
+        @Override
+        public void onUnityAdsAdLoaded(String placementId) {
+            UnityAds.show(InataRoomActivity.this, adUnitId, new UnityAdsShowOptions(), showListener);
+        }
+
+        @Override
+        public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
+            Log.e("UnityAdsExample", "Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+
+            logprogram.setText("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+        }
+    };
+
+    private IUnityAdsShowListener showListener = new IUnityAdsShowListener() {
+        @Override
+        public void onUnityAdsShowFailure(String placementId, UnityAds.UnityAdsShowError error, String message) {
+            Log.e("UnityAdsExample", "Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
+
+            logprogram.setText("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
+        }
+
+        @Override
+        public void onUnityAdsShowStart(String placementId) {
+            Log.v("UnityAdsExample", "onUnityAdsShowStart: " + placementId);
+
+            logprogram.setText("Log : The Unity ad was shown.");
+            show++;
+            InterstialMe.saveInteger(InterstialMe.SHOW,show,InataRoomActivity.this);
+            dataC();
+        }
+
+        @Override
+        public void onUnityAdsShowClick(String placementId) {
+            Log.v("UnityAdsExample", "onUnityAdsShowClick: " + placementId);
+
+            logprogram.setText("Log : Unity Ad was clicked.");
+            cik++;
+            InterstialMe.saveInteger(InterstialMe.OPEN,cik,InataRoomActivity.this);
+            dataC();
+        }
+
+        @Override
+        public void onUnityAdsShowComplete(String placementId, UnityAds.UnityAdsShowCompletionState state) {
+            Log.v("UnityAdsExample", "onUnityAdsShowComplete: " + placementId);
+
+            logprogram.setText("Log : Unity Ad recorded an impression.");
+            impressed++;
+            InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed,InataRoomActivity.this);
+            dataC();
+
+            if(autoclose) {
+                countDownTimeAR();
+            }
+        }
+    };
+
+    @Override
+    public void onInitializationComplete() {
+        DisplayInterstitialAd();
+    }
+
+    @Override
+    public void onInitializationFailed(UnityAds.UnityAdsInitializationError error, String message) {
+        Log.e("UnityAdsExample", "Unity Ads initialization failed with error: [" + error + "] " + message);
+
+        gagalt++;
+        InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity.this);
+        dataC();
+
+        if (keepgoing){
+            if(autoclose) {
+                countDownTimeAR();
+            }
+        }else{
+            countDownTimer.cancel();
+            Toast.makeText(InataRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Implement a function to load an interstitial ad. The ad will start to show after the ad has been loaded.
+    public void DisplayInterstitialAd () {
+        UnityAds.load(adUnitId, loadListener);
+
+        berhasilt++;
+        InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity.this);
+        dataC();
+        logprogram.setText("Log : Berhasil Memuat iklan interstitial Unity");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,36 +288,38 @@ public class InataRoomActivity extends AppCompatActivity {
             return;
         }
 
-        // Log the Mobile Ads SDK version.
-        Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
+        if (IsAdmob){
+            // Log the Mobile Ads SDK version.
+            Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
 
-        googleMobileAdsConsentManager =
-                GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
-        googleMobileAdsConsentManager.gatherConsent(
-                this,
-                consentError -> {
-                    if (consentError != null) {
-                        // Consent not obtained in current session.
-                        Log.w(
-                                TAG,
-                                String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
-                    }
+            googleMobileAdsConsentManager =
+                    GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
+            googleMobileAdsConsentManager.gatherConsent(
+                    this,
+                    consentError -> {
+                        if (consentError != null) {
+                            // Consent not obtained in current session.
+                            Log.w(
+                                    TAG,
+                                    String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
+                        }
 
-                    startGame();
+                        startGame();
 
-                    if (googleMobileAdsConsentManager.canRequestAds()) {
-                        initializeMobileAdsSdk();
-                    }
+                        if (googleMobileAdsConsentManager.canRequestAds()) {
+                            initializeMobileAdsSdk();
+                        }
 
-                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
-                        // Regenerate the options menu to include a privacy setting.
-                        invalidateOptionsMenu();
-                    }
-                });
+                        if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
+                            // Regenerate the options menu to include a privacy setting.
+                            invalidateOptionsMenu();
+                        }
+                    });
 
-        // This sample attempts to load ads using consent obtained in the previous session.
-        if (googleMobileAdsConsentManager.canRequestAds()) {
-            initializeMobileAdsSdk();
+            // This sample attempts to load ads using consent obtained in the previous session.
+            if (googleMobileAdsConsentManager.canRequestAds()) {
+                initializeMobileAdsSdk();
+            }
         }
 
         retryButton = findViewById(R.id.retry_button);
@@ -339,9 +446,9 @@ public class InataRoomActivity extends AppCompatActivity {
                         interstitialAd = null;
                         adIsLoading = false;
 
-                        gagalt++;
-                        InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity.this);
-                        dataC();
+//                        gagalt++;
+//                        InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity.this);
+//                        dataC();
 
                         String error =
                                 String.format(
@@ -354,15 +461,16 @@ public class InataRoomActivity extends AppCompatActivity {
                                         InataRoomActivity.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT)
                                 .show();
 
-                        logprogram.setText("Log : Error "+error);
-                        if (keepgoing){
-                            if(autoclose) {
-                                countDownTimeAR();
-                            }
-                        }else{
-                            countDownTimer.cancel();
-                            Toast.makeText(InataRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
-                        }
+                        logprogram.setText("Log : Error ADMOB "+error);
+                        UnityAds.initialize(getApplicationContext(), unityGameID, testMode, InataRoomActivity.this);
+//                        if (keepgoing){
+//                            if(autoclose) {
+//                                countDownTimeAR();
+//                            }
+//                        }else{
+//                            countDownTimer.cancel();
+//                            Toast.makeText(InataRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
+//                        }
                     }
                 });
     }
