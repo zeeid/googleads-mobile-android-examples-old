@@ -42,9 +42,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.zeei.penyegaran.data.InterstialMe;
 import com.zeei.penyegaran.data.RewardMe;
 
+import com.unity3d.ads.IUnityAdsLoadListener;
+import com.unity3d.ads.IUnityAdsShowListener;
+import com.unity3d.ads.UnityAdsShowOptions;
+import com.unity3d.ads.IUnityAdsInitializationListener;
+import com.unity3d.ads.UnityAds;
+
 /** Main Activity. Inflates main activity xml. */
 @SuppressLint("SetTextI18n")
-public class RewardRoomActivity extends AppCompatActivity {
+public class RewardRoomActivity extends AppCompatActivity implements IUnityAdsInitializationListener  {
 
     // Check your logcat output for the test device hashed ID e.g.
     // "Use RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("ABCDEF012345"))
@@ -52,6 +58,10 @@ public class RewardRoomActivity extends AppCompatActivity {
     // "Use new ConsentDebugSettings.Builder().addTestDeviceHashedId("ABCDEF012345") to set this as
     // a debug device".
     public static final String TEST_DEVICE_HASHED_ID = "ABCDEF012345";
+
+    private String unityGameID = "5855626";
+    private Boolean testMode = true;
+    private String adUnitId = "Rewarded_Android";
 
     private static final String AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
     private static final long COUNTER_TIME = 10;
@@ -74,7 +84,7 @@ public class RewardRoomActivity extends AppCompatActivity {
 
 
     public final String RELOADE="reload";
-    public boolean reload=false,autoclose,autoreload,IsIndo;
+    public boolean reload=false,autoclose,autoreload,IsIndo,IsAdmob=true;
     public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor;
     public int maxsuccess = 1, maxfail = 1;
     public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60;
@@ -137,6 +147,102 @@ public class RewardRoomActivity extends AppCompatActivity {
         }
 
         return randomAdCode;
+    }
+
+
+    private IUnityAdsLoadListener loadListener = new IUnityAdsLoadListener() {
+        @Override
+        public void onUnityAdsAdLoaded(String placementId) {
+            UnityAds.show(RewardRoomActivity.this, adUnitId, new UnityAdsShowOptions(), showListener);
+
+            berhasilt++;
+            RewardMe.saveInteger(RewardMe.BERHASIL,berhasilt,RewardRoomActivity.this);
+            dataC();
+            logprogram.setText("Log : Berhasil Memuat iklan Unity reward");
+        }
+
+        @Override
+        public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
+            Log.e("UnityAdsExample", "Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+
+            gagalt++;
+            RewardMe.saveInteger(RewardMe.GAGAL,gagalt,RewardRoomActivity.this);
+            dataC();
+
+            if (keepgoing){
+                if(autoclose) {
+                    countDownTimeAR();
+                }
+            }else{
+                countDownTimer.cancel();
+                Toast.makeText(RewardRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    private IUnityAdsShowListener showListener = new IUnityAdsShowListener() {
+        @Override
+        public void onUnityAdsShowFailure(String placementId, UnityAds.UnityAdsShowError error, String message) {
+            Log.e("UnityAdsExample", "Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
+
+            logprogram.setText("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
+        }
+
+        @Override
+        public void onUnityAdsShowStart(String placementId) {
+            Log.v("UnityAdsExample", "onUnityAdsShowStart: " + placementId);
+
+            logprogram.setText("Log : The Unity ad was shown.");
+            show++;
+            RewardMe.saveInteger(RewardMe.SHOW,show,RewardRoomActivity.this);
+            dataC();
+        }
+
+        @Override
+        public void onUnityAdsShowClick(String placementId) {
+            Log.v("UnityAdsExample", "onUnityAdsShowClick: " + placementId);
+
+            logprogram.setText("Log : Unity Ad was clicked.");
+            cik++;
+            RewardMe.saveInteger(RewardMe.OPEN,cik,RewardRoomActivity.this);
+            dataC();
+        }
+
+        @Override
+        public void onUnityAdsShowComplete(String placementId, UnityAds.UnityAdsShowCompletionState state) {
+            Log.v("UnityAdsExample", "onUnityAdsShowComplete: " + placementId);
+
+            logprogram.setText("Log : Unity Ad recorded an impression.");
+            impressed++;
+            RewardMe.saveInteger(RewardMe.IMPRESSED,impressed,RewardRoomActivity.this);
+            dataC();
+
+            if (state.equals(UnityAds.UnityAdsShowCompletionState.COMPLETED)) {
+                // Reward the user for watching the ad to completion
+                addCoins(1);
+            }
+
+            if(autoclose) {
+                countDownTimeAR();
+            }
+        }
+    };
+
+    @Override
+    public void onInitializationComplete() {
+        DisplayRewardedAd();
+    }
+
+    @Override
+    public void onInitializationFailed(UnityAds.UnityAdsInitializationError error, String message) {
+        Log.e("UnityAdsExample", "Unity Ads initialization failed with error: [" + error + "] " + message);
+
+        logprogram.setText("Log : Unity Ads initialization failed with error: [" + error + "] " + message);
+    }
+
+    // Implement a function to load a rewarded ad. The ad will start to show after the ad has been loaded.
+    public void DisplayRewardedAd () {
+        UnityAds.load(adUnitId, loadListener);
     }
 
     @Override
@@ -208,36 +314,39 @@ public class RewardRoomActivity extends AppCompatActivity {
             }
         });
 
-        // Log the Mobile Ads SDK version.
-        Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
 
-        googleMobileAdsConsentManager =
-                GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
-        googleMobileAdsConsentManager.gatherConsent(
-                this,
-                consentError -> {
-                    if (consentError != null) {
-                        // Consent not obtained in current session.
-                        Log.w(
-                                TAG,
-                                String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
-                    }
+        if (IsAdmob){
+            // Log the Mobile Ads SDK version.
+            Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
 
-                    startGame();
+            googleMobileAdsConsentManager =
+                    GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
+            googleMobileAdsConsentManager.gatherConsent(
+                    this,
+                    consentError -> {
+                        if (consentError != null) {
+                            // Consent not obtained in current session.
+                            Log.w(
+                                    TAG,
+                                    String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
+                        }
 
-                    if (googleMobileAdsConsentManager.canRequestAds()) {
-                        initializeMobileAdsSdk();
-                    }
+                        startGame();
 
-                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
-                        // Regenerate the options menu to include a privacy setting.
-                        invalidateOptionsMenu();
-                    }
-                });
+                        if (googleMobileAdsConsentManager.canRequestAds()) {
+                            initializeMobileAdsSdk();
+                        }
 
-        // This sample attempts to load ads using consent obtained in the previous session.
-        if (googleMobileAdsConsentManager.canRequestAds()) {
-            initializeMobileAdsSdk();
+                        if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
+                            // Regenerate the options menu to include a privacy setting.
+                            invalidateOptionsMenu();
+                        }
+                    });
+
+            // This sample attempts to load ads using consent obtained in the previous session.
+            if (googleMobileAdsConsentManager.canRequestAds()) {
+                initializeMobileAdsSdk();
+            }
         }
 
         // Create the "retry" button, which tries to show a rewarded ad between game plays.
@@ -368,9 +477,9 @@ public class RewardRoomActivity extends AppCompatActivity {
                             RewardRoomActivity.this.isLoading = false;
                             Toast.makeText(RewardRoomActivity.this, "onAdFailedToLoad", Toast.LENGTH_SHORT).show();
 
-                            gagalt++;
-                            RewardMe.saveInteger(RewardMe.GAGAL,gagalt,RewardRoomActivity.this);
-                            dataC();
+//                            gagalt++;
+//                            RewardMe.saveInteger(RewardMe.GAGAL,gagalt,RewardRoomActivity.this);
+//                            dataC();
 
                             String error =
                                     String.format(
@@ -383,15 +492,17 @@ public class RewardRoomActivity extends AppCompatActivity {
                                             RewardRoomActivity.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT)
                                     .show();
 
-                            logprogram.setText("Log : Error "+error);
-                            if (keepgoing){
-                                if(autoclose) {
-                                    countDownTimeAR();
-                                }
-                            }else{
-                                countDownTimer.cancel();
-                                Toast.makeText(RewardRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
-                            }
+                            logprogram.setText("Log : ADMOB Error "+error);
+
+                            UnityAds.initialize(getApplicationContext(), unityGameID, testMode, RewardRoomActivity.this);
+//                            if (keepgoing){
+//                                if(autoclose) {
+//                                    countDownTimeAR();
+//                                }
+//                            }else{
+//                                countDownTimer.cancel();
+//                                Toast.makeText(RewardRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
+//                            }
                         }
 
                         @Override
