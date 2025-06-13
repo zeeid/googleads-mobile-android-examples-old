@@ -60,7 +60,7 @@ public class RewardRoomActivity extends AppCompatActivity implements IUnityAdsIn
     public static final String TEST_DEVICE_HASHED_ID = "ABCDEF012345";
 
     private String unityGameID = "5855626";
-    private Boolean testMode = true;
+    private Boolean testMode = false;
     private String adUnitId = "Rewarded_Android";
 
     private static final String AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
@@ -175,6 +175,7 @@ public class RewardRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 }
             }else{
                 countDownTimer.cancel();
+                logprogram.setText("Log: Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
                 Toast.makeText(RewardRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
             }
         }
@@ -471,15 +472,15 @@ public class RewardRoomActivity extends AppCompatActivity implements IUnityAdsIn
                     new RewardedAdLoadCallback() {
                         @Override
                         public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+
+                            UnityAds.initialize(getApplicationContext(), unityGameID, testMode, RewardRoomActivity.this);
+
                             // Handle the error.
                             Log.d(TAG, loadAdError.getMessage());
                             rewardedAd = null;
                             RewardRoomActivity.this.isLoading = false;
                             Toast.makeText(RewardRoomActivity.this, "onAdFailedToLoad", Toast.LENGTH_SHORT).show();
 
-//                            gagalt++;
-//                            RewardMe.saveInteger(RewardMe.GAGAL,gagalt,RewardRoomActivity.this);
-//                            dataC();
 
                             String error =
                                     String.format(
@@ -494,15 +495,8 @@ public class RewardRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                             logprogram.setText("Log : ADMOB Error "+error);
 
-                            UnityAds.initialize(getApplicationContext(), unityGameID, testMode, RewardRoomActivity.this);
-//                            if (keepgoing){
-//                                if(autoclose) {
-//                                    countDownTimeAR();
-//                                }
-//                            }else{
-//                                countDownTimer.cancel();
-//                                Toast.makeText(RewardRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
-//                            }
+                            logprogram.setText("Log : UnityAds initialize ");
+
                         }
 
                         @Override

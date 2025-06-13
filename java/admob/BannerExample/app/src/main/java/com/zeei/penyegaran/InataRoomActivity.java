@@ -91,7 +91,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
 
     private String unityGameID = "5855626";
-    private Boolean testMode = true;
+    private Boolean testMode = false;
     private String adUnitId = "Interstitial_Android";
 
 
@@ -229,6 +229,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             }
         }else{
             countDownTimer.cancel();
+            logprogram.setText("Log: Unity Ads initialization failed with error: [" + error + "] " + message);
             Toast.makeText(InataRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
         }
     }
@@ -441,14 +442,12 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        UnityAds.initialize(getApplicationContext(), unityGameID, testMode, InataRoomActivity.this);
+
                         // Handle the error
                         Log.i(TAG, loadAdError.getMessage());
                         interstitialAd = null;
                         adIsLoading = false;
-
-//                        gagalt++;
-//                        InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity.this);
-//                        dataC();
 
                         String error =
                                 String.format(
@@ -462,15 +461,9 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                 .show();
 
                         logprogram.setText("Log : Error ADMOB "+error);
-                        UnityAds.initialize(getApplicationContext(), unityGameID, testMode, InataRoomActivity.this);
-//                        if (keepgoing){
-//                            if(autoclose) {
-//                                countDownTimeAR();
-//                            }
-//                        }else{
-//                            countDownTimer.cancel();
-//                            Toast.makeText(InataRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
-//                        }
+
+                        logprogram.setText("Log : UnityAds initialize ");
+
                     }
                 });
     }
