@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
     namespace 'com.zeei.penyegaran'
-    compileSdkVersion 34
+    compileSdk 36
     defaultConfig {
         applicationId "com.zeei.penyegaran"
         minSdkVersion 23
-        targetSdkVersion 34
+        targetSdk 36
         versionCode 10
         versionName "10"
         multiDexEnabled true
