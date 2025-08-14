@@ -286,6 +286,14 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
         Log.d(TAG, "Google interstitialAd: " + interstitialAd);
         Log.d(TAG, "Google canRequestAds: " + googleMobileAdsConsentManager.canRequestAds());
+        if (interstitialAd != null) {
+            interstitialAd.show(this);
+        }else {
+            //startGame();
+            if (googleMobileAdsConsentManager.canRequestAds()) {
+                loadAd();
+            }
+        }
     }
     private void loadUnityAd(){
         if (!UnityAds.isInitialized()) {
