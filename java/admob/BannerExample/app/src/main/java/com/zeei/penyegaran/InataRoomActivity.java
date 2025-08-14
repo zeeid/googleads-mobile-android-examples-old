@@ -91,7 +91,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
 
     private String unityGameID = "5855626";
-    private Boolean testMode = false;
+    private Boolean testMode = true;
     private String adUnitId = "Interstitial_Android";
 
     Random random = new Random();
@@ -278,9 +278,19 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         if (googleMobileAdsConsentManager.canRequestAds()) {
             initializeMobileAdsSdk();
         }
+
+        logprogram.setText("Log : Admob showing ");
+        showInterstitial();
     }
     private void loadUnityAd(){
-        UnityAds.initialize(getApplicationContext(), unityGameID, testMode, InataRoomActivity.this);
+        if (!UnityAds.isInitialized()) {
+            UnityAds.initialize(getApplicationContext(), unityGameID, testMode, InataRoomActivity.this);
+            logprogram.setText("Log : UnityAds initialize... ");
+        } else {
+            logprogram.setText("Log : UnityAds READY to Show... ");
+            // Jika sudah terinisialisasi, Anda bisa langsung coba muat iklannya
+            DisplayInterstitialAd();
+        }
     }
 
     @Override
@@ -343,8 +353,11 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             public void onClick(View view) {
 
                 if (useAdmob) {
-                    logprogram.setText("Log : Admob READY ");
-                    showInterstitial();
+                    logprogram.setText("Log : Admob start processing ");
+                    loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
+                } else {
+                    logprogram.setText("Log : UnityAds start processing ");
+                    loadUnityAd(); // Panggil fungsi untuk memuat Unity
                 }
             }
         });
