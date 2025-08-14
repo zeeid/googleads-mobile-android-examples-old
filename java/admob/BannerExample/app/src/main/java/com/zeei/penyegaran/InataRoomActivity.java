@@ -94,6 +94,9 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     private Boolean testMode = false;
     private String adUnitId = "Interstitial_Android";
 
+    Random random = new Random();
+    boolean useAdmob = random.nextBoolean();
+
 
     @Override
     public void onBackPressed() {
@@ -244,6 +247,42 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         logprogram.setText("Log : Berhasil Memuat iklan interstitial Unity");
     }
 
+    private void loadAdmobAd(){
+        Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
+
+        googleMobileAdsConsentManager =
+                GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
+        googleMobileAdsConsentManager.gatherConsent(
+                this,
+                consentError -> {
+                    if (consentError != null) {
+                        // Consent not obtained in current session.
+                        Log.w(
+                                TAG,
+                                String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
+                    }
+
+                    startGame();
+
+                    if (googleMobileAdsConsentManager.canRequestAds()) {
+                        initializeMobileAdsSdk();
+                    }
+
+                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
+                        // Regenerate the options menu to include a privacy setting.
+                        invalidateOptionsMenu();
+                    }
+                });
+
+        // This sample attempts to load ads using consent obtained in the previous session.
+        if (googleMobileAdsConsentManager.canRequestAds()) {
+            initializeMobileAdsSdk();
+        }
+    }
+    private void loadUnityAd(){
+        UnityAds.initialize(getApplicationContext(), unityGameID, testMode, InataRoomActivity.this);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -289,38 +328,12 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             return;
         }
 
-        if (IsAdmob){
-            // Log the Mobile Ads SDK version.
-            Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
-
-            googleMobileAdsConsentManager =
-                    GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
-            googleMobileAdsConsentManager.gatherConsent(
-                    this,
-                    consentError -> {
-                        if (consentError != null) {
-                            // Consent not obtained in current session.
-                            Log.w(
-                                    TAG,
-                                    String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
-                        }
-
-                        startGame();
-
-                        if (googleMobileAdsConsentManager.canRequestAds()) {
-                            initializeMobileAdsSdk();
-                        }
-
-                        if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
-                            // Regenerate the options menu to include a privacy setting.
-                            invalidateOptionsMenu();
-                        }
-                    });
-
-            // This sample attempts to load ads using consent obtained in the previous session.
-            if (googleMobileAdsConsentManager.canRequestAds()) {
-                initializeMobileAdsSdk();
-            }
+        if (useAdmob) {
+            logprogram.setText("Log : Admob start processing ");
+            loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
+        } else {
+            logprogram.setText("Log : UnityAds start processing ");
+            loadUnityAd(); // Panggil fungsi untuk memuat Unity
         }
 
         retryButton = findViewById(R.id.retry_button);
@@ -328,7 +341,11 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showInterstitial();
+
+                if (useAdmob) {
+                    logprogram.setText("Log : Admob READY ");
+                    showInterstitial();
+                }
             }
         });
 
@@ -589,9 +606,12 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     private void pauseGame() {
         if (gameOver || gamePaused) {
-          return;
+            return;
         }
-        countDownTimer.cancel();
+        // TAMBAHKAN PENGECEKAN INI
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
         gamePaused = true;
     }
 
