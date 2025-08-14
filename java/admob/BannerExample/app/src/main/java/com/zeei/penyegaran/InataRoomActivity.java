@@ -283,8 +283,9 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             initializeMobileAdsSdk();
         }
 
-        logprogram.setText("Log : Admob showing ");
-        showInterstitial();
+
+        Log.d(TAG, "Google interstitialAd: " + interstitialAd);
+        Log.d(TAG, "Google canRequestAds: " + googleMobileAdsConsentManager.canRequestAds());
     }
     private void loadUnityAd(){
         if (!UnityAds.isInitialized()) {
@@ -472,6 +473,9 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                         dataC();
                                     }
                                 });
+
+                        // Langsung tampilkan iklan karena sudah berhasil di-load.
+                        interstitialAd.show(InataRoomActivity.this);
                     }
 
                     @Override
