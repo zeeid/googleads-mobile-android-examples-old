@@ -167,6 +167,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             Log.e("UnityAdsExample", "Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
 
             logprogram.setText("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+
+            loadAdmobAd();
         }
     };
 
@@ -176,6 +178,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             Log.e("UnityAdsExample", "Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
 
             logprogram.setText("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
+
+            loadAdmobAd();
         }
 
         @Override
@@ -472,7 +476,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        UnityAds.initialize(getApplicationContext(), unityGameID, testMode, InataRoomActivity.this);
+                        loadUnityAd();
 
                         // Handle the error
                         Log.i(TAG, loadAdError.getMessage());
