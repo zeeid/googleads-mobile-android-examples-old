@@ -355,7 +355,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                boolean useAdmob = random.nextBoolean();
                 if (useAdmob) {
                     logprogram.setText("Log : Admob start processing ");
                     loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
