@@ -91,6 +91,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60;
     public String ratess,AdsUnitID;
     Button sett;
+    Button clearLogButton;
     TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
 
     private ScrollView logScrollView;
@@ -258,6 +259,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     private void loadAdmobAd(){
         Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
+        appendLog("Google Mobile Ads SDK Version: " + MobileAds.getVersion());
 
         googleMobileAdsConsentManager =
                 GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
@@ -361,6 +363,11 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                     loadUnityAd(); // Panggil fungsi untuk memuat Unity
                 }
             }
+        });
+
+        clearLogButton.setOnClickListener(v -> {
+            logprogram.setText(""); // Mengosongkan textview log
+            appendLog("Log telah dibersihkan."); // Memberi pesan konfirmasi di log baru
         });
 
         Button buttonreset = findViewById(R.id.reset);
@@ -703,6 +710,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         logprogram=findViewById(R.id.logprogram);
         logScrollView = findViewById(R.id.logScrollView);
         sett=findViewById(R.id.set_interes);
+        clearLogButton = findViewById(R.id.clear_log_button);
         showon=findViewById(R.id.shoewint);
         impreson=findViewById(R.id.impresint);
         times=findViewById(R.id.timede);
