@@ -91,7 +91,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
 
     private String unityGameID = "5855626";
-    private Boolean testMode = true;
+    private Boolean testMode = false;
     private String adUnitId = "Interstitial_Android";
 
     Random random = new Random();

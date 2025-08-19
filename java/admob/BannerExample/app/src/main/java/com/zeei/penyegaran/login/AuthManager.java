@@ -120,7 +120,7 @@ public class AuthManager {
                                 .put("ca-app-pub-3940256099942544/6300978111")); // Fixed Size Banner
 
                         offlineResponse.put("Iklan_Interstisial", new JSONArray()
-                                .put("ca-app-pub-7944170612384609/4062265402")
+                                .put("ca-app-pub-9781045687912585/9433317052")
                                 .put("ca-app-pub-9781045687912585/3735393547")
                                 .put("ca-app-pub-9781045687912585/1698281350")
                                 .put("ca-app-pub-9781045687912585/8213694600")
