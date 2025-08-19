@@ -91,7 +91,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60;
     public String ratess,AdsUnitID;
     Button sett;
-    Button clearLogButton;
+    Button clearLogButton, loadAdmobButton;
     TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
 
     private ScrollView logScrollView;
@@ -392,6 +392,17 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         });
             }
         });
+
+        loadAdmobButton.setOnClickListener(v -> {
+            appendLog("Tombol 'Load Admob' diklik. Memulai proses...");
+            // Pastikan SDK sudah siap dan ada izin sebelum memuat
+            if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
+            } else {
+                appendLog("Gagal: Izin iklan tidak ada. Coba mulai ulang activity.");
+                Toast.makeText(InataRoomActivity.this, "Cannot request ads yet.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void loadAd() {
@@ -601,17 +612,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         return super.onOptionsItemSelected(item);
     }
 
-    private void showInterstitial() {
-        // Show the ad if it's ready. Otherwise restart the game.
-        if (interstitialAd != null) {
-            interstitialAd.show(this);
-        } else {
-            startGame();
-            if (googleMobileAdsConsentManager.canRequestAds()) {
-                loadAd();
-            }
-        }
-    }
+
 
     private void startGame() {
         // Hide the button, and kick off the timer.
@@ -642,8 +643,22 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     }
 
     private void initializeMobileAdsSdk() {
+        appendLog("Admob Initialize Checking");
         if (isMobileAdsInitializeCalled.getAndSet(true)) {
-            return;
+            if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                appendLog("Admob Ready to Show");
+                loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
+            } else {
+                appendLog("Gagal: Izin iklan tidak ada. Coba mulai ulang activity.");
+                Toast.makeText(InataRoomActivity.this, "Cannot request ads yet.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else{
+            appendLog("Admob Initialize Called");
+            MobileAds.initialize(this, initializationStatus -> {
+                // Initialization is complete. Now load the ad.
+                loadAd();
+            });
         }
 
         // Set your test devices.
@@ -652,10 +667,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 //                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
 //                        .build());
 
-        MobileAds.initialize(this, initializationStatus -> {
-            // Initialization is complete. Now load the ad.
-            loadAd();
-        });
+
     }
 
     public void countDownTimeAR(){
@@ -711,6 +723,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         logScrollView = findViewById(R.id.logScrollView);
         sett=findViewById(R.id.set_interes);
         clearLogButton = findViewById(R.id.clear_log_button);
+        loadAdmobButton = findViewById(R.id.load_admob_button);
         showon=findViewById(R.id.shoewint);
         impreson=findViewById(R.id.impresint);
         times=findViewById(R.id.timede);

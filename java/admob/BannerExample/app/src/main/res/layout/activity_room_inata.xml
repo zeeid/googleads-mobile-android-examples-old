@@ -183,6 +183,16 @@
                         android:textStyle="bold" />
 
                     <Button
+                        android:id="@+id/load_admob_button"
+                        style="@android:style/Widget.Holo.Button.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="0dp"
+                        android:layout_toStartOf="@id/clear_log_button"
+                        android:text="Admob" />
+
+                    <Button
                         android:id="@+id/clear_log_button"
                         style="@android:style/Widget.Holo.Button.Small"
                         android:layout_width="wrap_content"
