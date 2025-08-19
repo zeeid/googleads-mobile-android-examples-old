@@ -170,12 +170,26 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/logprogram"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Log : "
+                    android:text="Log Program:"
                     android:textStyle="bold" />
+
+                <ScrollView
+                    android:id="@+id/logScrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:layout_marginTop="4dp"
+                    android:background="#f0f0f0"
+                    android:padding="4dp">
+
+                    <TextView
+                        android:id="@+id/logprogram"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textIsSelectable="true"/>
+                </ScrollView>
 
             </LinearLayout>
 
@@ -190,30 +204,36 @@
             tools:layout_editor_absoluteY="274dp" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/game_title"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/gameContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
         android:layout_below="@+id/LinearLayoutAtas"
-        android:text="Imposible Game Level 0"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingTop="24dp">
 
-    <TextView
-        android:id="@+id/timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/game_title"
-        android:layout_centerHorizontal="true"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TextView
+            android:id="@+id/game_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Imposible Game Level 0"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
-        android:id="@+id/retry_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="Retry" />
+        <TextView
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <Button
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Retry" />
+
+    </LinearLayout>
 
 </RelativeLayout>

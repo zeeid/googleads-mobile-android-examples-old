@@ -31,6 +31,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.Activity;
+import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,6 +46,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.zeei.penyegaran.data.InterstialMe;
 
+import java.util.Date;
+import java.util.Locale;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -89,6 +92,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     public String ratess,AdsUnitID;
     Button sett;
     TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
+
+    private ScrollView logScrollView;
 
     private String unityGameID = "5855626";
     private Boolean testMode = false;
@@ -166,7 +171,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
             Log.e("UnityAdsExample", "Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
 
-            logprogram.setText("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+            appendLog("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
             categori.setText("Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
             //loadAdmobAd();
         }
@@ -177,7 +182,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         public void onUnityAdsShowFailure(String placementId, UnityAds.UnityAdsShowError error, String message) {
             Log.e("UnityAdsExample", "Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
 
-            logprogram.setText("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
+            appendLog("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
 
             loadAdmobAd();
         }
@@ -186,7 +191,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         public void onUnityAdsShowStart(String placementId) {
             Log.v("UnityAdsExample", "onUnityAdsShowStart: " + placementId);
 
-            logprogram.setText("Log : The Unity ad was shown.");
+            appendLog("Log : The Unity ad was shown.");
             show++;
             InterstialMe.saveInteger(InterstialMe.SHOW,show,InataRoomActivity.this);
             dataC();
@@ -196,7 +201,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         public void onUnityAdsShowClick(String placementId) {
             Log.v("UnityAdsExample", "onUnityAdsShowClick: " + placementId);
 
-            logprogram.setText("Log : Unity Ad was clicked.");
+            appendLog("Log : Unity Ad was clicked.");
             cik++;
             InterstialMe.saveInteger(InterstialMe.OPEN,cik,InataRoomActivity.this);
             dataC();
@@ -206,7 +211,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         public void onUnityAdsShowComplete(String placementId, UnityAds.UnityAdsShowCompletionState state) {
             Log.v("UnityAdsExample", "onUnityAdsShowComplete: " + placementId);
 
-            logprogram.setText("Log : Unity Ad recorded an impression.");
+            appendLog("Log : Unity Ad recorded an impression.");
             impressed++;
             InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed,InataRoomActivity.this);
             dataC();
@@ -236,7 +241,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             }
         }else{
             countDownTimer.cancel();
-            logprogram.setText("Log: Unity Ads initialization failed with error: [" + error + "] " + message);
+            appendLog("Log: Unity Ads initialization failed with error: [" + error + "] " + message);
             Toast.makeText(InataRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
         }
     }
@@ -248,7 +253,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         berhasilt++;
         InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity.this);
         dataC();
-        logprogram.setText("Log : Berhasil Memuat iklan interstitial Unity");
+        appendLog("Log : Berhasil Memuat iklan interstitial Unity");
     }
 
     private void loadAdmobAd(){
@@ -298,9 +303,9 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     private void loadUnityAd(){
         if (!UnityAds.isInitialized()) {
             UnityAds.initialize(getApplicationContext(), unityGameID, testMode, InataRoomActivity.this);
-            logprogram.setText("Log : UnityAds initialize... ");
+            appendLog("Log : UnityAds initialize... ");
         } else {
-            logprogram.setText("Log : UnityAds READY to Show... ");
+            appendLog("Log : UnityAds READY to Show... ");
             // Jika sudah terinisialisasi, Anda bisa langsung coba muat iklannya
             DisplayInterstitialAd();
         }
@@ -352,10 +357,10 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         }
 
         if (useAdmob) {
-            logprogram.setText("Log : Admob start processing ");
+            appendLog("Log : Admob start processing ");
             loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
         } else {
-            logprogram.setText("Log : UnityAds start processing ");
+            appendLog("Log : UnityAds start processing ");
             loadUnityAd(); // Panggil fungsi untuk memuat Unity
         }
 
@@ -366,10 +371,10 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             public void onClick(View view) {
                 boolean useAdmob = random.nextBoolean();
                 if (useAdmob) {
-                    logprogram.setText("Log : Admob start processing ");
+                    appendLog("Log : Admob start processing ");
                     loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
                 } else {
-                    logprogram.setText("Log : UnityAds start processing ");
+                    appendLog("Log : UnityAds start processing ");
                     loadUnityAd(); // Panggil fungsi untuk memuat Unity
                 }
             }
@@ -403,7 +408,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         requestot++;
         InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,InataRoomActivity.this);
         dataC();
-        logprogram.setText("Log : Memuat iklan ADMOB interstitial");
+        appendLog("Log : Memuat iklan ADMOB interstitial");
         // Request a new ad if one isn't already loaded.
         if (adIsLoading || interstitialAd != null) {
             return;
@@ -426,13 +431,13 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         berhasilt++;
                         InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity.this);
                         dataC();
-                        logprogram.setText("Log : Berhasil Memuat iklan interstitial");
+                        appendLog("Log : Berhasil Memuat iklan interstitial");
                         interstitialAd.setFullScreenContentCallback(
                                 new FullScreenContentCallback() {
                                     @Override
                                     public void onAdClicked() {
                                         // Called when a click is recorded for an ad.
-                                        logprogram.setText("Log : Ad was clicked.");
+                                        appendLog("Log : Ad was clicked.");
                                         cik++;
                                         InterstialMe.saveInteger(InterstialMe.OPEN,cik,InataRoomActivity.this);
                                         dataC();
@@ -444,7 +449,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                         // Make sure to set your reference to null so you don't
                                         // show it a second time.
                                         InataRoomActivity.this.interstitialAd = null;
-                                        logprogram.setText("Log : The ad was dismissed.");
+                                        appendLog("Log : The ad was dismissed.");
                                         Log.d("TAG", "The ad was dismissed.");
                                     }
 
@@ -454,14 +459,14 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                         // Make sure to set your reference to null so you don't
                                         // show it a second time.
                                         InataRoomActivity.this.interstitialAd = null;
-                                        logprogram.setText("Log : The ad failed to show.");
+                                        appendLog("Log : The ad failed to show.");
                                         Log.d("TAG", "The ad failed to show.");
                                     }
 
                                     @Override
                                     public void onAdImpression() {
                                         // Called when an impression is recorded for an ad.
-                                        logprogram.setText("Log : Ad recorded an impression.");
+                                        appendLog("Log : Ad recorded an impression.");
                                         impressed++;
                                         InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed,InataRoomActivity.this);
                                         dataC();
@@ -475,7 +480,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                     public void onAdShowedFullScreenContent() {
                                         // Called when fullscreen content is shown.
                                         Log.d("TAG", "The ad was shown.");
-                                        logprogram.setText("Log : The ad was shown.");
+                                        appendLog("Log : The ad was shown.");
                                         show++;
                                         InterstialMe.saveInteger(InterstialMe.SHOW,show,InataRoomActivity.this);
                                         dataC();
@@ -506,11 +511,11 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                         InataRoomActivity.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT)
                                 .show();
 
-                        logprogram.setText("Log : Error ADMOB "+error);
+                        appendLog("Log : Error ADMOB "+error);
 
                         categori.setText("Log : Error ADMOB "+error);
 
-                        logprogram.setText("Log : UnityAds initialize ");
+                        appendLog("Log : UnityAds initialize ");
 
                     }
                 });
@@ -718,10 +723,22 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         close=findViewById(R.id.timeautoReloadINTERTV);
         categori=findViewById(R.id.keywordInter);
         logprogram=findViewById(R.id.logprogram);
+        logScrollView = findViewById(R.id.logScrollView);
         sett=findViewById(R.id.set_interes);
         showon=findViewById(R.id.shoewint);
         impreson=findViewById(R.id.impresint);
         times=findViewById(R.id.timede);
+    }
+
+    private void appendLog(String message) {
+        // Membuat stempel waktu sederhana
+        String timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+
+        // Menambahkan pesan baru ke TextView
+        logprogram.append(timeStamp + " - " + message + "\n");
+
+        // Otomatis scroll ke paling bawah
+        logScrollView.post(() -> logScrollView.fullScroll(View.FOCUS_DOWN));
     }
 
     @SuppressLint("SetTextI18n")
