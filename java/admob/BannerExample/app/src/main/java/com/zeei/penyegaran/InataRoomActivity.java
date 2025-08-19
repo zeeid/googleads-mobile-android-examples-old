@@ -91,7 +91,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60;
     public String ratess,AdsUnitID;
     Button sett;
-    Button clearLogButton, loadAdmobButton;
+    Button clearLogButton, loadAdmobButton, loadUnityButton;
     TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
 
     private ScrollView logScrollView;
@@ -402,6 +402,12 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 appendLog("Gagal: Izin iklan tidak ada. Coba mulai ulang activity.");
                 Toast.makeText(InataRoomActivity.this, "Cannot request ads yet.", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        loadUnityButton.setOnClickListener(v -> {
+            appendLog("Tombol 'Load Unity' diklik. Memulai proses...");
+            // Fungsi loadUnityAd sudah menangani inisialisasi jika diperlukan
+            loadUnityAd();
         });
     }
 
@@ -724,6 +730,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         sett=findViewById(R.id.set_interes);
         clearLogButton = findViewById(R.id.clear_log_button);
         loadAdmobButton = findViewById(R.id.load_admob_button);
+        loadUnityButton = findViewById(R.id.load_unity_button);
         showon=findViewById(R.id.shoewint);
         impreson=findViewById(R.id.impresint);
         times=findViewById(R.id.timede);
