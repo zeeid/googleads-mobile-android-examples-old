@@ -265,7 +265,6 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 this,
                 consentError -> {
                     if (consentError != null) {
-                        // Consent not obtained in current session.
                         Log.w(
                                 TAG,
                                 String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
@@ -274,31 +273,15 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                     startGame();
 
                     if (googleMobileAdsConsentManager.canRequestAds()) {
+                        // Cukup panggil inisialisasi di sini.
+                        // Proses loadAd() akan otomatis dijalankan setelah inisialisasi selesai.
                         initializeMobileAdsSdk();
                     }
 
                     if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
-                        // Regenerate the options menu to include a privacy setting.
                         invalidateOptionsMenu();
                     }
                 });
-
-        // This sample attempts to load ads using consent obtained in the previous session.
-        if (googleMobileAdsConsentManager.canRequestAds()) {
-            initializeMobileAdsSdk();
-        }
-
-
-        Log.d(TAG, "Google interstitialAd: " + interstitialAd);
-        Log.d(TAG, "Google canRequestAds: " + googleMobileAdsConsentManager.canRequestAds());
-        if (interstitialAd != null) {
-            interstitialAd.show(this);
-        }else {
-            //startGame();
-            if (googleMobileAdsConsentManager.canRequestAds()) {
-                loadAd();
-            }
-        }
     }
     private void loadUnityAd(){
         if (!UnityAds.isInitialized()) {
@@ -662,15 +645,10 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 //                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
 //                        .build());
 
-        new Thread(
-                () -> {
-                    // Initialize the Google Mobile Ads SDK on a background thread.
-                    MobileAds.initialize(this, initializationStatus -> {});
-
-                    // Load an ad on the main thread.
-                    runOnUiThread(() -> loadAd());
-                })
-                .start();
+        MobileAds.initialize(this, initializationStatus -> {
+            // Initialization is complete. Now load the ad.
+            loadAd();
+        });
     }
 
     public void countDownTimeAR(){
