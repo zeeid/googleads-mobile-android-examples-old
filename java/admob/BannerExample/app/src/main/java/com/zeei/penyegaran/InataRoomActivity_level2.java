@@ -791,7 +791,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
         InterstialMe.saveInteger(InterstialMe.OPEN,0,InataRoomActivity_level2.this);
         InterstialMe.saveInteger(InterstialMe.IMPRESSED,0,InataRoomActivity_level2.this);
         InterstialMe.saveString(InterstialMe.RATE,"0",this);
-        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,0,InataRoomActivity.this);
+        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,0,InataRoomActivity_level2.this);
         data();
         CekDateUP();
     }

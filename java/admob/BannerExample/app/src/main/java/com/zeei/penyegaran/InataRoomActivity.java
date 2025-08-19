@@ -167,8 +167,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             Log.e("UnityAdsExample", "Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
 
             logprogram.setText("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
-
-            loadAdmobAd();
+            categori.setText("Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+            //loadAdmobAd();
         }
     };
 
@@ -403,7 +403,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         requestot++;
         InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,InataRoomActivity.this);
         dataC();
-        logprogram.setText("Log : Memuat iklan interstitial");
+        logprogram.setText("Log : Memuat iklan ADMOB interstitial");
         // Request a new ad if one isn't already loaded.
         if (adIsLoading || interstitialAd != null) {
             return;
@@ -488,7 +488,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        loadUnityAd();
+                        //loadUnityAd();
 
                         // Handle the error
                         Log.i(TAG, loadAdError.getMessage());
@@ -507,6 +507,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                 .show();
 
                         logprogram.setText("Log : Error ADMOB "+error);
+
+                        categori.setText("Log : Error ADMOB "+error);
 
                         logprogram.setText("Log : UnityAds initialize ");
 
