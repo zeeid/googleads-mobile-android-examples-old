@@ -522,7 +522,6 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                         categori.setText("Log : Error ADMOB "+error);
 
-                        appendLog("Log : UnityAds initialize ");
 
                     }
                 });

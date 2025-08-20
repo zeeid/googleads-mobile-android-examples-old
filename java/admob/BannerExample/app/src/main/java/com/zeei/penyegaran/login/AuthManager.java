@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class AuthManager {
 
-    private static final String LOGIN_URL = "https://zeeid.net/api/mobile/login";
+    private static final String LOGIN_URL = "https://api.jundi.hm/api/mobile/login";
     private static final String PREFS_NAME = "DataLogin";
 
     // Interface untuk callback hasil login
@@ -120,12 +120,10 @@ public class AuthManager {
                                 .put("ca-app-pub-3940256099942544/6300978111")); // Fixed Size Banner
 
                         offlineResponse.put("Iklan_Interstisial", new JSONArray()
-                                .put("ca-app-pub-9781045687912585/9433317052")
-                                .put("ca-app-pub-9781045687912585/3735393547")
-                                .put("ca-app-pub-9781045687912585/1698281350")
-                                .put("ca-app-pub-9781045687912585/8213694600")
-                                .put("ca-app-pub-9781045687912585/5741484053")
-                                .put("ca-app-pub-9781045687912585/9905958336")
+                                .put("ca-app-pub-9781045687912585/2799817833")
+                                .put("ca-app-pub-9781045687912585/1351004799")
+                                .put("ca-app-pub-9781045687912585/7571948159")
+                                .put("ca-app-pub-9781045687912585/5485690921")
 //                                .put("ca-app-pub-7944170612384609/5398908827")
 //                                .put("ca-app-pub-7944170612384609/1351852601")
 //                                .put("ca-app-pub-7944170612384609/7638620431")
