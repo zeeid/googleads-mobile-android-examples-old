@@ -166,6 +166,9 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         @Override
         public void onUnityAdsAdLoaded(String placementId) {
             UnityAds.show(InataRoomActivity.this, adUnitId, new UnityAdsShowOptions(), showListener);
+            berhasilt++;
+            InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity.this);
+            dataC();
         }
 
         @Override
@@ -185,7 +188,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
             appendLog("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
 
-            loadAdmobAd();
+//            loadAdmobAd();
         }
 
         @Override
@@ -251,8 +254,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     public void DisplayInterstitialAd () {
         UnityAds.load(adUnitId, loadListener);
 
-        berhasilt++;
-        InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity.this);
+        requestot++;
+        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,InataRoomActivity.this);
         dataC();
         appendLog("Log : Berhasil Memuat iklan interstitial Unity");
     }
