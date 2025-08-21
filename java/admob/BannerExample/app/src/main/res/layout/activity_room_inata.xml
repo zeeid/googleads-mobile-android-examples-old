@@ -248,7 +248,14 @@
         android:layout_below="@+id/LinearLayoutAtas"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:paddingTop="24dp">
+        android:paddingTop="4dp">
+
+        <Button
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Retry" />
 
         <TextView
             android:id="@+id/game_title"
@@ -261,15 +268,10 @@
             android:id="@+id/timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <Button
-            android:id="@+id/retry_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Retry" />
+
 
     </LinearLayout>
 
