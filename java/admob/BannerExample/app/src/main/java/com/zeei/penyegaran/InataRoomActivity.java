@@ -98,7 +98,14 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     private String unityGameID = "5855626";
     private Boolean testMode = false;
-    private String adUnitId = "Interstitial_Android";
+    //private String adUnitId = "Interstitial_Android";
+    private final String[] unityAdUnitIds = {
+            "Interstitial_Android", // GANTI DENGAN ID PERTAMA ANDA
+            "Interstitial_Android_Bidding", // GANTI DENGAN ID KEDUA ANDA
+            "Gabungan_intertial_ads",
+            "PL_air_terjun",
+            "geo_collection"  // GANTI DENGAN ID KETIGA ANDA
+    };
 
     Random random = new Random();
     boolean useAdmob = random.nextBoolean();
@@ -161,11 +168,19 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         return randomAdCode;
     }
 
+    private String getRandomUnityAdUnitId() {
+        // Memilih indeks acak dari 0 sampai (panjang array - 1)
+        int randomIndex = random.nextInt(unityAdUnitIds.length);
+        String selectedAdUnitId = unityAdUnitIds[randomIndex];
+        Log.d(TAG, "Menggunakan Unity Ad Unit ID: " + selectedAdUnitId);
+        appendLog("Log: Memilih Unity Ad Unit ID: " + selectedAdUnitId);
+        return selectedAdUnitId;
+    }
 
     private IUnityAdsLoadListener loadListener = new IUnityAdsLoadListener() {
         @Override
         public void onUnityAdsAdLoaded(String placementId) {
-            UnityAds.show(InataRoomActivity.this, adUnitId, new UnityAdsShowOptions(), showListener);
+            UnityAds.show(InataRoomActivity.this, placementId, new UnityAdsShowOptions(), showListener);
             berhasilt++;
             InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity.this);
             dataC();
@@ -252,7 +267,9 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     // Implement a function to load an interstitial ad. The ad will start to show after the ad has been loaded.
     public void DisplayInterstitialAd () {
-        UnityAds.load(adUnitId, loadListener);
+
+        String randomAdUnitId = getRandomUnityAdUnitId();
+        UnityAds.load(randomAdUnitId, loadListener);
 
         requestot++;
         InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,InataRoomActivity.this);
