@@ -9,11 +9,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -203,6 +205,40 @@ public class MainActivity extends AppCompatActivity {
         TextView navHeaderEmail = headerView.findViewById(R.id.nav_header_textView_email);
         navHeaderEmail.setText(email);
 
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.nav_sync_data) {
+                    // Mengecek apakah sudah ada data di SharedPreferences
+                    SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                    String storedEmail = sharedPref.getString("email", null);
+                    String storedPassword = sharedPref.getString("password", null);
+
+                    // Panggil fungsi login di AuthManager dengan callback untuk hasil login
+                    AuthManager.performLogin(MainActivity.this, storedEmail, storedPassword, new AuthManager.LoginCallback() {
+                        @Override
+                        public void onLoginResult(boolean success) {
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (success) {
+                                        // Login berhasil
+                                        Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        // Login gagal
+                                        Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+                // Handle other navigation item clicks here.
+                return true;
+            }
+        });
+
         MetaData gdprMetaData = new MetaData(this);
         gdprMetaData.set("gdpr.consent", true);
         gdprMetaData.commit();
@@ -251,38 +287,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 cekIp();
-            }
-        });
-
-        // Tombol untuk sinkronisasi akun
-        Button buttonSyncAccount = findViewById(R.id.buttonSyncAccount);
-        buttonSyncAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Mengecek apakah sudah ada data di SharedPreferences
-                SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-                String storedName = sharedPref.getString("name", null);
-                String storedEmail = sharedPref.getString("email", null);
-                String storedPassword = sharedPref.getString("password", null);
-
-                // Panggil fungsi login di AuthManager dengan callback untuk hasil login
-                AuthManager.performLogin(MainActivity.this, storedEmail, storedPassword, new AuthManager.LoginCallback() {
-                    @Override
-                    public void onLoginResult(boolean success) {
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (success) {
-                                    // Login berhasil
-                                    Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    // Login gagal
-                                    Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-                    }
-                });
             }
         });
 

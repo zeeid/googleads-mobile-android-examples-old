@@ -2,6 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_sync_data"
+            android:title="Sync Data Account" />
+        <item
             android:id="@+id/nav_banana_room"
             android:title="Menu Banana Room" />
     </group>
