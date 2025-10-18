@@ -87,7 +87,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     public final String RELOADE="reload";
     public boolean reload=false,autoclose,autoreload,IsIndo, IsAdmob=true;
     public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor;
-    public int maxsuccess = 1, maxfail = 1;
+    public int maxsuccess = 1, maxfail = 1, isAutoLoad = 0;
     public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60;
     public String ratess,AdsUnitID;
     Button sett;
@@ -336,7 +336,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         
         maxsuccess  = sharedPref.getInt("maxsuccess", 0);
         maxfail     = sharedPref.getInt("maxfail", 0);
-
+        isAutoLoad  = sharedPref.getInt("isAutoLoad", 0);
+        Log.d("SettingsLog", "isAutoLoad: " + isAutoLoad);
         Log.d("SettingsLog", "maxsuccess: " + maxsuccess);
         Log.d("SettingsLog", "maxfail: " + maxfail);
         Log.d("SettingsLog", "berhasilt: " + berhasilt);
@@ -361,12 +362,14 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             return;
         }
 
-        if (useAdmob) {
-            appendLog("Log : Admob start processing ");
-            loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
-        } else {
-            appendLog("Log : UnityAds start processing ");
-            loadUnityAd(); // Panggil fungsi untuk memuat Unity
+        if(isAutoLoad == 1) {
+            if (useAdmob) {
+                appendLog("Log : Admob start processing ");
+                loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
+            } else {
+                appendLog("Log : UnityAds start processing ");
+                loadUnityAd(); // Panggil fungsi untuk memuat Unity
+            }
         }
 
         retryButton = findViewById(R.id.retry_button);

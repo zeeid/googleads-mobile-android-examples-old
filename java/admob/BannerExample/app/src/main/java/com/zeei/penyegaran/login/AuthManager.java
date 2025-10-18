@@ -45,6 +45,7 @@ public class AuthManager {
                         offlineResponse.put("isClearCache", 0);
                         offlineResponse.put("isVPNProtection", 0);
                         offlineResponse.put("isTestAds", 0);
+                        offlineResponse.put("isAutoLoad", 0);
                         offlineResponse.put("isRotation", 0);
                         offlineResponse.put("isMixadstype", 0);
                         offlineResponse.put("isIndoprot", 0);
@@ -100,6 +101,7 @@ public class AuthManager {
                         offlineResponse.put("isClearCache", 0);
                         offlineResponse.put("isVPNProtection", 0);
                         offlineResponse.put("isTestAds", 0);
+                        offlineResponse.put("isAutoLoad", 0);
                         offlineResponse.put("isRotation", 0);
                         offlineResponse.put("isMixadstype", 0);
                         offlineResponse.put("isIndoprot", 0);
@@ -214,6 +216,7 @@ public class AuthManager {
             editor.putInt("isClearCache", jsonResponse.getInt("isClearCache"));
             editor.putInt("isVPNProtection", jsonResponse.getInt("isVPNProtection"));
             editor.putInt("isTestAds", jsonResponse.getInt("isTestAds"));
+            editor.putInt("isAutoLoad", jsonResponse.getInt("isAutoLoad"));
             editor.putInt("isRotation", jsonResponse.getInt("isRotation"));
             editor.putInt("isMixadstype", jsonResponse.getInt("isMixadstype"));
             editor.putInt("isIndoprot", jsonResponse.getInt("isIndoprot"));
