@@ -15,30 +15,25 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Objects;
-
 
 public class FetchGeoIp extends AsyncTask<Void,Void,Void> {
     private String data="";
     private String dataAll="";
-    private String lines = "";
     private String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected Void doInBackground(Void... voids) {
-
-        BufferedReader bufferedReader = null;
         try {
             URL url = new URL("http://ip-api.com/json/?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query");
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             InputStream inputStream = httpURLConnection.getInputStream();
-            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String line = bufferedReader.readLine();
-
-            while (!Objects.equals(line, lines)) {
-                data = line + "\n";
-                lines = line;
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
             }
+            data = stringBuilder.toString();
 
             JSONObject JO = new JSONObject(data);
             dataAll = "IP : "+JO.getString("query")+"\n"+
@@ -51,19 +46,16 @@ public class FetchGeoIp extends AsyncTask<Void,Void,Void> {
                     "Time Zone : "+JO.getString("timezone")+"\n"+
                     "Latitude : "+JO.getString("lat")+"\n"+
                     "Longitude : "+JO.getString("lon")+"\n"+
-
-                    "mobile : "+JO.getString("mobile")+"\n"+
-                    "proxy : "+JO.getString("proxy")+"\n"+
-                    "hosting : "+JO.getString("hosting")+"\n"+
-
+                    "mobile : "+JO.getBoolean("mobile")+"\n"+
+                    "proxy : "+JO.getBoolean("proxy")+"\n"+
+                    "hosting : "+JO.getBoolean("hosting")+"\n"+
                     "ISP : "+JO.getString("isp")+"\n\n\n";
-
-
         } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
         return null;
     }
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onPreExecute() {
