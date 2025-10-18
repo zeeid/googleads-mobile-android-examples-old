@@ -240,6 +240,16 @@ public class MainActivity extends AppCompatActivity {
                             });
                         }
                     });
+                } else if (id == R.id.nav_logout) {
+                    // Hapus semua data SharedPreferences
+                    SharedPreferences settings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                    settings.edit().clear().apply();
+
+                    // Pindah ke LoginActivity dan hapus semua activity sebelumnya
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 }
                 // Handle other navigation item clicks here.
                 return true;
