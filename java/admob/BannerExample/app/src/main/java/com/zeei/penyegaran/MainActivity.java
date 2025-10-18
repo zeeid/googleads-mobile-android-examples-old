@@ -20,6 +20,7 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.zeei.penyegaran.data.FetchGeoIp;
 import com.zeei.penyegaran.login.AuthManager;
 
@@ -193,6 +194,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        
+        SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String email = sharedPref.getString("email", "user@example.com");
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        TextView navHeaderEmail = headerView.findViewById(R.id.nav_header_textView_email);
+        navHeaderEmail.setText(email);
 
         MetaData gdprMetaData = new MetaData(this);
         gdprMetaData.set("gdpr.consent", true);
