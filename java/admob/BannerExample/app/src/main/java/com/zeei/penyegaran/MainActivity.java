@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private final AtomicBoolean isMobileAdsInitializeCalled = new AtomicBoolean(false);
     private GoogleMobileAdsConsentManager googleMobileAdsConsentManager;
     private static final String PREFS_NAME = "DataLogin";
+    private DrawerLayout drawerLayout;
 
     private class GetAdvertisingIdTask extends AsyncTask<Void, Void, String> {
 
@@ -196,6 +199,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
         
         SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String email = sharedPref.getString("email", "user@example.com");
@@ -210,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.nav_sync_data) {
+                    Log.d("NavBarLog","nav_sync_data di klik");
                     // Mengecek apakah sudah ada data di SharedPreferences
                     SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                     String storedEmail = sharedPref.getString("email", null);
@@ -229,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
                                         // Login gagal
                                         Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
                                     }
+                                    drawerLayout.closeDrawer(GravityCompat.START);
                                 }
                             });
                         }
