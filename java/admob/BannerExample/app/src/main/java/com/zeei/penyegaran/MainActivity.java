@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private final AtomicBoolean isMobileAdsInitializeCalled = new AtomicBoolean(false);
     private GoogleMobileAdsConsentManager googleMobileAdsConsentManager;
     private static final String PREFS_NAME = "DataLogin";
+    private static final String DARK_MODE_PREF = "dark_mode";
     private DrawerLayout drawerLayout;
 
     private class GetAdvertisingIdTask extends AsyncTask<Void, Void, String> {
@@ -199,6 +201,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean isDarkMode = sharedPreferences.getBoolean(DARK_MODE_PREF, false);
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
 
         drawerLayout = findViewById(R.id.drawer_layout);
         
@@ -319,6 +329,26 @@ public class MainActivity extends AppCompatActivity {
                 // Tambahkan kode lain sesuai dengan tindakan yang ingin Anda lakukan ketika FAB diklik
 
                 setSystemTimeZoneByIP(MainActivity.this);
+            }
+        });
+
+        FloatingActionButton darkModeButton = findViewById(R.id.darkModeButton);
+        darkModeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("NavBarLog","darkModeButton di klik");
+                SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                boolean isDarkMode = sharedPreferences.getBoolean(DARK_MODE_PREF, false);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                if (isDarkMode) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    editor.putBoolean(DARK_MODE_PREF, false);
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    editor.putBoolean(DARK_MODE_PREF, true);
+                }
+                editor.apply();
             }
         });
 
