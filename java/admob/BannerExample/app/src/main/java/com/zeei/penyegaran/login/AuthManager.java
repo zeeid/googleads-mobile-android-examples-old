@@ -39,6 +39,8 @@ public class AuthManager {
                         offlineResponse.put("jml_baner", 1);
                         offlineResponse.put("ReLoadBaner", 0);
                         offlineResponse.put("TimerBaner", 60);
+                        offlineResponse.put("SizeBaner", 6);
+                        offlineResponse.put("IsRamdomSizeBaner", 0);
                         offlineResponse.put("ReLoadInata", 0);
                         offlineResponse.put("jml_inata", 1);
                         offlineResponse.put("TimerInata", 60);
@@ -95,6 +97,8 @@ public class AuthManager {
                         offlineResponse.put("jml_baner", 1);
                         offlineResponse.put("ReLoadBaner", 0);
                         offlineResponse.put("TimerBaner", 60);
+                        offlineResponse.put("SizeBaner", 6);
+                        offlineResponse.put("IsRamdomSizeBaner", 0);
                         offlineResponse.put("ReLoadInata", 0);
                         offlineResponse.put("jml_inata", 1);
                         offlineResponse.put("TimerInata", 60);
@@ -210,6 +214,8 @@ public class AuthManager {
             editor.putInt("jml_baner", jsonResponse.getInt("jml_baner"));
             editor.putInt("ReLoadBaner", jsonResponse.getInt("ReLoadBaner"));
             editor.putInt("TimerBaner", jsonResponse.getInt("TimerBaner"));
+            editor.putInt("SizeBaner", jsonResponse.getInt("SizeBaner"));
+            editor.putInt("IsRamdomSizeBaner", jsonResponse.getInt("IsRamdomSizeBaner"));
             editor.putInt("ReLoadInata", jsonResponse.getInt("ReLoadInata"));
             editor.putInt("jml_inata", jsonResponse.getInt("jml_inata"));
             editor.putInt("TimerInata", jsonResponse.getInt("TimerInata"));
