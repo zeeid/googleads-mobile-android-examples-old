@@ -240,6 +240,9 @@ public class MainActivity extends AppCompatActivity {
                             });
                         }
                     });
+                } else if (id == R.id.nav_banana_room) {
+                    Intent intent = new Intent(MainActivity.this, BananaRoomActivity.class);
+                    startActivity(intent);
                 } else if (id == R.id.nav_logout) {
                     // Hapus semua data SharedPreferences
                     SharedPreferences settings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);

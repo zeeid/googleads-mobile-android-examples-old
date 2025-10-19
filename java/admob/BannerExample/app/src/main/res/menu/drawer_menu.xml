@@ -6,7 +6,7 @@
             android:title="Sync Data Account" />
         <item
             android:id="@+id/nav_banana_room"
-            android:title="Menu Banana Room" />
+            android:title="Banana Room" />
     </group>
     <item android:title="User">
         <menu>

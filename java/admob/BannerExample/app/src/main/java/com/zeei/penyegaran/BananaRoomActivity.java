@@ -1,0 +1,261 @@
+package com.zeei.penyegaran;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.CountDownTimer;
+import android.preference.PreferenceManager;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.zeei.penyegaran.data.VARIABELS;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Objects;
+
+import static java.util.Calendar.DATE;
+
+public class BananaRoomActivity extends AppCompatActivity {
+
+    private int sizebans;
+    private int banyak;
+    TextView berhasil,gagal,auto,jumato,jumbanner,categori,size,tanggalan,adopen,rate;
+
+    private static final String DATE="yyasd",GG="gsdag",BB="beqrewb",CIK="casdfsc",CT="crewt",IMP="imasfdpr";
+
+    public int gagalt=0,berhasilt=0,impre=0,cik=0,show=0,impressed = 0,requestot=0,TimerBaner=60;
+    public String ratess;
+
+    public boolean sedang=false,asd;
+
+
+    public final String RELOADE="reload";
+    public boolean reload=false,autoclose,autoreload,IsIndo, IsAdmob=true;
+    public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor;
+    public int maxsuccess = 1, maxfail = 1, isAutoLoad = 0;
+
+//    public String ratess,AdsUnitID;
+    Button sett;
+    Button clearLogButton, loadAdmobButton, loadUnityButton;
+//    TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        asd=false;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_room_banana);
+        CekDateUP();
+        asd=true;
+
+
+        Button setting =findViewById(R.id.set_banner);
+        setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        viewBinds();
+        data();
+
+        SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
+
+        rotation        = (sharedPref.getInt("isRotation", 0) == 1 );
+        mixbanerinter   = (sharedPref.getInt("isMixadstype", 0) == 1 );
+        usetestunit     = (sharedPref.getInt("isTestAds", 0) == 1 );
+        vpnprot         = (sharedPref.getInt("isVPNProtection", 0) == 1 );;
+        indoprot        = (sharedPref.getInt("isIndoprot", 0) == 1 );
+        keepgoing       = (sharedPref.getInt("isKeepgoing", 0) == 1 );
+
+        autoreload       = (sharedPref.getInt("ReLoadBaner", 0) == 1 );
+
+        maxsuccess  = sharedPref.getInt("maxsuccess", 0);
+        maxfail     = sharedPref.getInt("maxfail", 0);
+        isAutoLoad  = sharedPref.getInt("isAutoLoad", 0);
+
+        TimerBaner  = sharedPref.getInt("TimerBaner", 0);
+
+        banyak=sharedPref.getInt("jml_baner", 1);
+        jumbanner.setText("Total ad per imprs :"+banyak);
+        if(autoreload){
+            auto.setText("AUTO RELOAD ACTIVE");
+            jumato.setText("in :"+TimerBaner+" second");
+        }else{
+            auto.setText("AUTO RELOAD DEACTIVE");
+            jumato.setText("NULL");
+        }
+
+        //size.setText(BannerSetting.getStringBan(BannerSetting.SIZEBANNER,this));
+        sizebans=6;
+    }
+
+    @SuppressLint("SetTextI18n")
+    public void data(){
+
+        tanggalan.setText("Estimates calculation in :\n"+getString(DATE,this));
+        berhasilt = getInteger(BB, this);
+        gagalt=getInteger(GG,this);
+        impre=getInteger(IMP,this);
+        cik=getInteger(CIK,this);
+        ratess = getString(CT, this);
+
+        cekRate();
+
+        berhasil.setText("LOAD :"+berhasilt);
+        gagal.setText("FAILED :"+gagalt);
+        adopen.setText("CLICK :"+cik);
+
+    }
+
+    public void resetResult(){
+        saveInteger(GG,0,this);
+        saveInteger(CIK,0,this);
+        saveInteger(BB,0,this);
+        saveInteger(IMP,0,this);
+        saveString(CT,"0",this);
+    }
+
+    public void viewBinds(){
+        berhasil=findViewById(R.id.succsestot);
+        gagal=findViewById(R.id.failtot);
+        auto=findViewById(R.id.autoReloads);
+        adopen=findViewById(R.id.adopenBan);
+        jumato=findViewById(R.id.timereload);
+        jumbanner=findViewById(R.id.jumlahbanner);
+        categori=findViewById(R.id.categoryban);
+        size=findViewById(R.id.sizebanner);
+        rate=findViewById(R.id.rateSBan);
+        tanggalan=findViewById(R.id.tanggal);
+    }
+
+    public void CekDateUP(){
+        @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy");
+        String date = df.format(Calendar.getInstance().getTime());
+        if(!date.equals(getString(DATE, this))){
+            resetResult();
+            saveString(DATE,date,this);
+        }else{
+            saveString(DATE,date,this);
+        }
+    }
+
+    public void resetOnClick(View view){
+        resetResult();
+        data();
+    }
+    @Override
+    protected void onResume() {
+        CekDateUP();
+        data();
+        super.onResume();
+    }
+
+
+
+    public void loadMain(){
+        Toast.makeText(this, "please wait for loading..", Toast.LENGTH_SHORT).show();
+        if(!sedang){
+            loadAd(banyak);
+
+        }
+    }
+
+
+
+    @SuppressLint("SetTextI18n")
+    public void loadAd(int banyak){
+        LinearLayout layout = findViewById(R.id.banner_layout);
+        layout.removeAllViews();
+        for(int a = 1;a<=banyak;a++) {
+            Log.d("BANNER", "loadAd:"+a);
+//            AdView mAdView = new AdView(this);
+//            TextView sixe =new TextView(this);
+//            sixe.setText("AdView "+a);
+//            if(sizebans==1){
+//                mAdView.setAdSize(AdSize.BANNER);
+//            }else if(sizebans==2){
+//                mAdView.setAdSize(AdSize.LARGE_BANNER);
+//            }else if(sizebans==3){
+//                mAdView.setAdSize(AdSize.MEDIUM_RECTANGLE);
+//            }else if(sizebans==4){
+//                mAdView.setAdSize(AdSize.FULL_BANNER);
+//            }else if(sizebans==5){
+//                mAdView.setAdSize(AdSize.LEADERBOARD);
+//            }else{
+//                mAdView.setAdSize(AdSize.SMART_BANNER);
+//            }
+//
+//
+//
+//            AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
+//
+//            layout.addView(sixe);
+//            layout.addView(mAdView);
+//            mAdView.loadAd(adRequestBuilder.addKeyword(VARIABELS.getString(SettingAct.CATEGORYAD,this,getString(R.string.app_name))).build());
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    public void cekRate(){
+
+        float total = ((float)cik/(float)berhasilt)*100;
+        DecimalFormat df = new DecimalFormat("####.##");
+        ratess = df.format(total);
+        saveString(CT,ratess,BananaRoomActivity.this);
+        rate.setText("CTR :"+ratess+"%");
+    }
+    @SuppressLint("ApplySharedPref")
+    public void saveString(String key, String value, Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+    public static String getString(String key, Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(key, "empty");
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public void saveInteger(String key, Integer value, Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(key,value);
+        editor.commit();
+    }
+    public static int getInteger(String key, Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getInt(key, 0);
+    }
+
+    public static void startActivity(Context context) {
+
+        Intent intent = new Intent(context, BananaRoomActivity.class);
+        context.startActivity(intent);
+    }
+}
