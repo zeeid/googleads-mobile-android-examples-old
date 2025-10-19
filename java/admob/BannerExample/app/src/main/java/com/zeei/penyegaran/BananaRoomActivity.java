@@ -22,7 +22,6 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.zeei.penyegaran.data.VARIABELS;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -35,11 +34,9 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Objects;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static java.util.Calendar.DATE;
 
 public class BananaRoomActivity extends AppCompatActivity {
     // Check your logcat output for the test device hashed ID e.g.
@@ -64,7 +61,7 @@ public class BananaRoomActivity extends AppCompatActivity {
 
     private static final String DATE="yyasd",GG="gsdag",BB="beqrewb",CIK="casdfsc",CT="crewt",IMP="imasfdpr";
 
-    public int gagalt=0,berhasilt=0,impre=0,cik=0,show=0,impressed = 0,requestot=0,TimerBaner=60;
+    public int gagalt=0,berhasilt=0,impre=0,cik=0,show=0,impressed = 0,requestot=0,TimerBaner=60,SizeBaner=6;
     public String ratess;
 
     public boolean sedang=false,asd;
@@ -116,6 +113,7 @@ public class BananaRoomActivity extends AppCompatActivity {
         isAutoLoad  = sharedPref.getInt("isAutoLoad", 0);
 
         TimerBaner  = sharedPref.getInt("TimerBaner", 0);
+        SizeBaner  = sharedPref.getInt("SizeBaner", 6);
 
         banyak=sharedPref.getInt("jml_baner", 1);
         jumbanner.setText("Total ad per imprs :"+banyak);
@@ -382,14 +380,27 @@ public class BananaRoomActivity extends AppCompatActivity {
         }
     }
 
+    public int GetSizeBaner (){
+        SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
+        int SizeValue;
+        if ((sharedPref.getInt("IsRamdomSizeBaner", 0) == 1 )){
+            SizeValue = new Random().nextInt(6) + 1;
+        }else{
+            SizeValue = SizeBaner;
+        }
+
+        Log.d("BANNER", "GetSizeBaner:"+SizeValue);
+        return SizeValue;
+    }
 
 
     @SuppressLint("SetTextI18n")
     public void loadAd(int banyak){
         LinearLayout layout = findViewById(R.id.banner_layout);
         layout.removeAllViews();
-        sizebans=6;
+
         for(int a = 1;a<=banyak;a++) {
+            sizebans= GetSizeBaner();
             Log.d("BANNER", "loadAd:"+a);
             adView = new AdView(this);
             adView.setAdUnitId(AD_UNIT_ID);
