@@ -466,6 +466,11 @@ public class BananaRoomActivity extends AppCompatActivity {
                 public void onAdOpened() {
                     // Code to be executed when an ad opens an overlay that
                     // covers the screen.
+
+                    if(countDownTimer != null) {
+                        countDownTimer.cancel();
+                        countDownTimer = null;
+                    }
                 }
 
                 @Override
@@ -474,6 +479,11 @@ public class BananaRoomActivity extends AppCompatActivity {
                     cik++;
                     saveInteger(CIK, cik, BananaRoomActivity.this);
                     data();
+
+                    if(countDownTimer != null) {
+                        countDownTimer.cancel();
+                        countDownTimer = null;
+                    }
                 }
 
                 @Override
