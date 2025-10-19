@@ -35,7 +35,9 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BananaRoomActivity extends AppCompatActivity {
@@ -393,6 +395,43 @@ public class BananaRoomActivity extends AppCompatActivity {
         return SizeValue;
     }
 
+    public String GetUnitID() {
+
+        String randomAdCode = "";
+
+        // Mengambil SharedPreferences
+        SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
+
+        // Mengambil array ads sebagai Set
+        Set<String> layarPembukaAplikasiSet = sharedPref.getStringSet("Iklan_Banner_Ukuran_Tetap", new HashSet<>());
+
+        // Konversi Set menjadi array
+        String[] layarPembukaAplikasiArray = layarPembukaAplikasiSet.toArray(new String[0]);
+
+        // Memilih adCode secara random jika ada data
+        if (layarPembukaAplikasiArray.length > 0) {
+            Random random = new Random();
+            int randomIndex = random.nextInt(layarPembukaAplikasiArray.length);
+
+            AcakSponsor     = (sharedPref.getInt("isAcakSponsor", 0) == 1 );
+
+            if (AcakSponsor){
+                randomAdCode = layarPembukaAplikasiArray[randomIndex];
+            }else{
+                if(layarPembukaAplikasiArray.length > 1){
+                    randomAdCode = layarPembukaAplikasiArray[0];
+                }else{
+                    randomAdCode = layarPembukaAplikasiArray[0];
+                }
+            }
+
+            // Menampilkan adCode random
+            Log.d("AnotherActivity", "Random Ad Code: " + randomAdCode);
+        }
+
+        return randomAdCode;
+    }
+
 
     @SuppressLint("SetTextI18n")
     public void loadAd(int banyak){
@@ -403,7 +442,7 @@ public class BananaRoomActivity extends AppCompatActivity {
             sizebans= GetSizeBaner();
             Log.d("BANNER", "loadAd:"+a);
             adView = new AdView(this);
-            adView.setAdUnitId(AD_UNIT_ID);
+            adView.setAdUnitId(GetUnitID());
 
 
             TextView sixe =new TextView(this);
