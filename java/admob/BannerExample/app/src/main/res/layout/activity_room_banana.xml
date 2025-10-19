@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TextView"
+            android:text="Succes Total"
             android:textStyle="bold" />
 
         <TextView
@@ -26,14 +26,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TextView"
+            android:text="Gagal Total"
             android:textStyle="bold" />
         <TextView
             android:id="@+id/adopenBan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TextView"
+            android:text="Open Total"
             android:textStyle="bold" />
     </LinearLayout>
     <LinearLayout
@@ -72,17 +72,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/set_banner"
-                style="@android:style/Widget.Holo.Button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Setting"
-                android:textAllCaps="false"
-                tools:ignore="RtlCompat" />
+
 
             <Button
                 android:id="@+id/set_reset"
@@ -106,7 +96,7 @@
                 android:id="@+id/autoReloads"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text="AUTO RELOAD"
                 android:textStyle="bold" />
 
             <TextView
@@ -114,21 +104,21 @@
                 android:id="@+id/timereload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="Timer Load" />
 
             <TextView
                 android:id="@+id/jumlahbanner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/timereload"
-                android:text="TextView"
+                android:text="JUMLAH BANNER"
                 android:textStyle="italic" />
             <TextView
                 android:layout_below="@id/jumlahbanner"
                 android:id="@+id/categoryban"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="Category" />
 
             <TextView
                 android:id="@+id/sizebanner"

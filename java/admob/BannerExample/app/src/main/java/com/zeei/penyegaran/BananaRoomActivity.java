@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +27,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 
@@ -124,18 +126,6 @@ public class BananaRoomActivity extends AppCompatActivity {
             initializeMobileAdsSdk();
         }
 
-
-
-
-
-        Button setting =findViewById(R.id.set_banner);
-        setting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
         viewBinds();
         data();
 
@@ -219,7 +209,7 @@ public class BananaRoomActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     public void data(){
 
-        tanggalan.setText("Estimates calculation in :\n"+getString(DATE,this));
+        tanggalan.setText("Estimates calculation in : "+getString(DATE,this));
         berhasilt = getInteger(BB, this);
         gagalt=getInteger(GG,this);
         impre=getInteger(IMP,this);
@@ -344,6 +334,44 @@ public class BananaRoomActivity extends AppCompatActivity {
 
 
             AdRequest adRequest = new AdRequest.Builder().build();
+
+            adView.setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    // Code to be executed when an ad finishes loading.
+                    berhasilt++;
+                    saveInteger(BB, berhasilt, BananaRoomActivity.this);
+                    data();
+                }
+
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                    // Code to be executed when an ad request fails.
+                    gagalt++;
+                    saveInteger(GG, gagalt, BananaRoomActivity.this);
+                    data();
+                }
+
+                @Override
+                public void onAdOpened() {
+                    // Code to be executed when an ad opens an overlay that
+                    // covers the screen.
+                }
+
+                @Override
+                public void onAdClicked() {
+                    // Code to be executed when the user clicks on an ad.
+                    cik++;
+                    saveInteger(CIK, cik, BananaRoomActivity.this);
+                    data();
+                }
+
+                @Override
+                public void onAdClosed() {
+                    // Code to be executed when the user is about to return
+                    // to the app after tapping on an ad.
+                }
+            });
 
 
             layout.addView(sixe);
