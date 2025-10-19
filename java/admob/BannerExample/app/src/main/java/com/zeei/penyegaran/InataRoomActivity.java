@@ -723,7 +723,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         Intent intent;
                         if (mixbanerinter) {
                             // Open BananaFixedActivity (You might want to change this to BananaFixedActivity)
-                            intent = new Intent(InataRoomActivity.this, InataRoomActivity.class);
+                            intent = new Intent(InataRoomActivity.this, BananaRoomActivity.class);
                         } else {
                             // Open InataRoomActivity (stays the same)
                             intent = new Intent(InataRoomActivity.this, InataRoomActivity_level1.class);
