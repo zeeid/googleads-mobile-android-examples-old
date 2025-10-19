@@ -10,9 +10,14 @@ import android.preference.PreferenceManager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,16 +27,34 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Calendar.DATE;
 
 public class BananaRoomActivity extends AppCompatActivity {
+    // Check your logcat output for the test device hashed ID e.g.
+    // "Use RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("ABCDEF012345"))
+    // to get test ads on this device" or
+    // "Use new ConsentDebugSettings.Builder().addTestDeviceHashedId("ABCDEF012345") to set this as
+    // a debug device".
+    public static final String TEST_DEVICE_HASHED_ID = "ABCDEF012345";
+
+    // This is an ad unit ID for a test ad. Replace with your own banner ad unit ID.
+    private static final String AD_UNIT_ID = "ca-app-pub-3940256099942544/9214589741";
+    private static final String TAG = "MyActivity";
+    private final AtomicBoolean isMobileAdsInitializeCalled = new AtomicBoolean(false);
+    private GoogleMobileAdsConsentManager googleMobileAdsConsentManager;
+    private AdView adView;
+    private FrameLayout adContainerView;
+
 
     private int sizebans;
     private int banyak;
@@ -58,6 +81,7 @@ public class BananaRoomActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        destroyBanner();
         finish();
         asd=false;
     }
@@ -68,6 +92,40 @@ public class BananaRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_room_banana);
         CekDateUP();
         asd=true;
+
+
+        // Log the Mobile Ads SDK version.
+        Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
+
+        googleMobileAdsConsentManager =
+                GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
+        googleMobileAdsConsentManager.gatherConsent(
+                this,
+                consentError -> {
+                    if (consentError != null) {
+                        // Consent not obtained in current session.
+                        Log.w(
+                                TAG,
+                                String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
+                    }
+
+                    if (googleMobileAdsConsentManager.canRequestAds()) {
+                        initializeMobileAdsSdk();
+                    }
+
+                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
+                        // Regenerate the options menu to include a privacy setting.
+                        invalidateOptionsMenu();
+                    }
+                });
+
+        // This sample attempts to load ads using consent obtained in the previous session.
+        if (googleMobileAdsConsentManager.canRequestAds()) {
+            initializeMobileAdsSdk();
+        }
+
+
+
 
 
         Button setting =findViewById(R.id.set_banner);
@@ -110,6 +168,52 @@ public class BananaRoomActivity extends AppCompatActivity {
 
         //size.setText(BannerSetting.getStringBan(BannerSetting.SIZEBANNER,this));
         sizebans=6;
+
+//        loadMain();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        View menuItemView = findViewById(item.getItemId());
+        PopupMenu popup = new PopupMenu(this, menuItemView);
+        popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+        popup
+                .getMenu()
+                .findItem(R.id.privacy_settings)
+                .setVisible(googleMobileAdsConsentManager.isPrivacyOptionsRequired());
+        popup.show();
+        popup.setOnMenuItemClickListener(
+                popupMenuItem -> {
+                    if (popupMenuItem.getItemId() == R.id.privacy_settings) {
+                        // Handle changes to user consent.
+                        googleMobileAdsConsentManager.showPrivacyOptionsForm(
+                                this,
+                                formError -> {
+                                    if (formError != null) {
+                                        Toast.makeText(this, formError.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        return true;
+                    } else if (popupMenuItem.getItemId() == R.id.ad_inspector) {
+                        MobileAds.openAdInspector(
+                                this,
+                                error -> {
+                                    // Error will be non-null if ad inspector closed due to an error.
+                                    if (error != null) {
+                                        Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        return true;
+                    }
+                    return false;
+                });
+        return super.onOptionsItemSelected(item);
     }
 
     @SuppressLint("SetTextI18n")
@@ -166,11 +270,35 @@ public class BananaRoomActivity extends AppCompatActivity {
         resetResult();
         data();
     }
+
+    /** Called when leaving the activity */
+    @Override
+    public void onPause() {
+        if (adView != null) {
+            adView.pause();
+        }
+        super.onPause();
+    }
+
     @Override
     protected void onResume() {
         CekDateUP();
         data();
         super.onResume();
+
+        if (adView != null) {
+            adView.resume();
+        }
+    }
+
+    /** Called before the activity is destroyed */
+    @Override
+    public void onDestroy() {
+        destroyBanner();
+        if (adView != null) {
+            adView.destroy();
+        }
+        super.onDestroy();
     }
 
 
@@ -178,7 +306,7 @@ public class BananaRoomActivity extends AppCompatActivity {
     public void loadMain(){
         Toast.makeText(this, "please wait for loading..", Toast.LENGTH_SHORT).show();
         if(!sedang){
-            loadAd(banyak);
+            loadAd(6);
 
         }
     }
@@ -191,33 +319,54 @@ public class BananaRoomActivity extends AppCompatActivity {
         layout.removeAllViews();
         for(int a = 1;a<=banyak;a++) {
             Log.d("BANNER", "loadAd:"+a);
-//            AdView mAdView = new AdView(this);
-//            TextView sixe =new TextView(this);
-//            sixe.setText("AdView "+a);
-//            if(sizebans==1){
-//                mAdView.setAdSize(AdSize.BANNER);
-//            }else if(sizebans==2){
-//                mAdView.setAdSize(AdSize.LARGE_BANNER);
-//            }else if(sizebans==3){
-//                mAdView.setAdSize(AdSize.MEDIUM_RECTANGLE);
-//            }else if(sizebans==4){
-//                mAdView.setAdSize(AdSize.FULL_BANNER);
-//            }else if(sizebans==5){
-//                mAdView.setAdSize(AdSize.LEADERBOARD);
-//            }else{
-//                mAdView.setAdSize(AdSize.SMART_BANNER);
-//            }
-//
-//
-//
-//            AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
-//
-//            layout.addView(sixe);
-//            layout.addView(mAdView);
-//            mAdView.loadAd(adRequestBuilder.addKeyword(VARIABELS.getString(SettingAct.CATEGORYAD,this,getString(R.string.app_name))).build());
+            adView = new AdView(this);
+            adView.setAdUnitId(AD_UNIT_ID);
+
+
+            TextView sixe =new TextView(this);
+            sixe.setText("AdView "+a);
+
+            if(sizebans==1){
+                adView.setAdSize(AdSize.BANNER);
+            }else if(sizebans==2){
+                adView.setAdSize(AdSize.LARGE_BANNER);
+            }else if(sizebans==3){
+                adView.setAdSize(AdSize.MEDIUM_RECTANGLE);
+            }else if(sizebans==4){
+                adView.setAdSize(AdSize.FULL_BANNER);
+            }else if(sizebans==5){
+                adView.setAdSize(AdSize.LEADERBOARD);
+            }else{
+                // Request an anchored adaptive banner with a width of 360.
+                adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, 360));
+            }
+
+
+
+            AdRequest adRequest = new AdRequest.Builder().build();
+
+
+            layout.addView(sixe);
+            layout.addView(adView);
+            adView.loadAd(adRequest);
         }
     }
 
+    public void destroyBanner() {
+        // Remove banner from view hierarchy.
+        if (adView != null) {
+            View parentView = (View) adView.getParent();
+            if (parentView instanceof ViewGroup) {
+                ((ViewGroup) parentView).removeView(adView);
+            }
+
+            // Destroy the banner ad resources.
+            adView.destroy();
+        }
+
+        // Drop reference to the banner ad.
+        adView = null;
+    }
 
     @SuppressLint("SetTextI18n")
     public void cekRate(){
@@ -257,5 +406,30 @@ public class BananaRoomActivity extends AppCompatActivity {
 
         Intent intent = new Intent(context, BananaRoomActivity.class);
         context.startActivity(intent);
+    }
+
+    private void initializeMobileAdsSdk() {
+        if (isMobileAdsInitializeCalled.getAndSet(true)) {
+            return;
+        }
+
+        // Set your test devices.
+        MobileAds.setRequestConfiguration(
+                new RequestConfiguration.Builder()
+                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
+                        .build());
+
+        // [START initialize_sdk]
+        new Thread(
+                () -> {
+                    // Initialize the Google Mobile Ads SDK on a background thread.
+                    MobileAds.initialize(this, initializationStatus -> {});
+                    // [START_EXCLUDE silent]
+                    // Load an ad on the main thread.
+                    runOnUiThread(this::loadMain);
+                    // [END_EXCLUDE]
+                })
+                .start();
+        // [END initialize_sdk]
     }
 }
