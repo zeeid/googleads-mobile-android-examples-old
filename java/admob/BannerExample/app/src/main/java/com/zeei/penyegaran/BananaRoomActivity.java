@@ -57,7 +57,7 @@ public class BananaRoomActivity extends AppCompatActivity {
     private AdView adView;
     private FrameLayout adContainerView;
 
-
+    private CountDownTimer countDownTimer;
     private int sizebans;
     private int banyak;
     TextView berhasil,gagal,auto,jumato,jumbanner,categori,size,tanggalan,adopen,rate;
@@ -71,18 +71,20 @@ public class BananaRoomActivity extends AppCompatActivity {
 
 
     public final String RELOADE="reload";
-    public boolean reload=false,autoclose,autoreload,IsIndo, IsAdmob=true;
+    public boolean isTimerJalan=false, reload=false,autoclose,autoreload,IsIndo, IsAdmob=true;
     public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor;
     public int maxsuccess = 1, maxfail = 1, isAutoLoad = 0;
 
-//    public String ratess,AdsUnitID;
     Button sett;
     Button clearLogButton, loadAdmobButton, loadUnityButton;
-//    TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if(countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
         destroyBanner();
         finish();
         asd=false;
@@ -94,6 +96,58 @@ public class BananaRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_room_banana);
         CekDateUP();
         asd=true;
+
+        viewBinds();
+        data();
+
+        SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
+
+        rotation        = (sharedPref.getInt("isRotation", 0) == 1 );
+        mixbanerinter   = (sharedPref.getInt("isMixadstype", 0) == 1 );
+        usetestunit     = (sharedPref.getInt("isTestAds", 0) == 1 );
+        vpnprot         = (sharedPref.getInt("isVPNProtection", 0) == 1 );;
+        indoprot        = (sharedPref.getInt("isIndoprot", 0) == 1 );
+        keepgoing       = (sharedPref.getInt("isKeepgoing", 0) == 1 );
+
+        autoreload       = (sharedPref.getInt("ReLoadBaner", 0) == 1 );
+
+        maxsuccess  = sharedPref.getInt("maxsuccess", 0);
+        maxfail     = sharedPref.getInt("maxfail", 0);
+        isAutoLoad  = sharedPref.getInt("isAutoLoad", 0);
+
+        TimerBaner  = sharedPref.getInt("TimerBaner", 0);
+
+        banyak=sharedPref.getInt("jml_baner", 1);
+        jumbanner.setText("Total ad per imprs :"+banyak);
+
+        if (keepgoing){
+            if (gagalt > maxfail || berhasilt > maxsuccess) {
+                String message;
+                if (gagalt > maxfail) {
+                    message = "Maksimal Fail tercukupi : " + gagalt + "/" + maxfail;
+                } else {
+                    message = "Maksimal Load tercukupi : " + berhasilt + "/" + maxsuccess;
+                }
+
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+
+                if (isTaskRoot()) {
+                    Intent intent = new Intent(this, MainActivity.class);
+                    startActivity(intent);
+                }
+
+                finish(); // Selesai dengan aktivitas ini
+                return;
+            }
+        }
+
+        if(autoreload){
+            auto.setText("AUTO RELOAD ACTIVE");
+            jumato.setText("in :"+TimerBaner+" second");
+        }else{
+            auto.setText("AUTO RELOAD DEACTIVE");
+            jumato.setText("NULL");
+        }
 
 
         // Log the Mobile Ads SDK version.
@@ -125,41 +179,19 @@ public class BananaRoomActivity extends AppCompatActivity {
         if (googleMobileAdsConsentManager.canRequestAds()) {
             initializeMobileAdsSdk();
         }
+    }
 
-        viewBinds();
-        data();
 
-        SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
-
-        rotation        = (sharedPref.getInt("isRotation", 0) == 1 );
-        mixbanerinter   = (sharedPref.getInt("isMixadstype", 0) == 1 );
-        usetestunit     = (sharedPref.getInt("isTestAds", 0) == 1 );
-        vpnprot         = (sharedPref.getInt("isVPNProtection", 0) == 1 );;
-        indoprot        = (sharedPref.getInt("isIndoprot", 0) == 1 );
-        keepgoing       = (sharedPref.getInt("isKeepgoing", 0) == 1 );
-
-        autoreload       = (sharedPref.getInt("ReLoadBaner", 0) == 1 );
-
-        maxsuccess  = sharedPref.getInt("maxsuccess", 0);
-        maxfail     = sharedPref.getInt("maxfail", 0);
-        isAutoLoad  = sharedPref.getInt("isAutoLoad", 0);
-
-        TimerBaner  = sharedPref.getInt("TimerBaner", 0);
-
-        banyak=sharedPref.getInt("jml_baner", 1);
-        jumbanner.setText("Total ad per imprs :"+banyak);
-        if(autoreload){
-            auto.setText("AUTO RELOAD ACTIVE");
-            jumato.setText("in :"+TimerBaner+" second");
-        }else{
-            auto.setText("AUTO RELOAD DEACTIVE");
-            jumato.setText("NULL");
+    public void StartAutoReload(){
+        if (isTimerJalan){
+            return;
         }
 
-        //size.setText(BannerSetting.getStringBan(BannerSetting.SIZEBANNER,this));
-        sizebans=6;
+        if(autoreload){
+            isTimerJalan = true;
+            AutoReload();
+        }
 
-//        loadMain();
     }
 
     @Override
@@ -232,6 +264,42 @@ public class BananaRoomActivity extends AppCompatActivity {
         saveString(CT,"0",this);
     }
 
+    public void AutoReload(){
+        if (countDownTimer == null) countDownTimer =  new CountDownTimer(TimerBaner*1000, 1000) {
+
+            @SuppressLint("SetTextI18n")
+            public void onTick(long millisUntilFinished) {
+                sedang=true;
+                if (autoreload){
+                    jumato.setText("in :"+((millisUntilFinished/1000)-1)+" second");
+                }
+
+            }
+
+            public void onFinish() {
+
+                if (autoreload){
+                    if (adView != null) {
+                        adView.destroy();
+                    }
+
+                    // Menutup aktivitas saat ini
+                    finish();
+                    Intent intent;
+                    if (mixbanerinter){
+                        // Membuka BananaFixedActivity
+                        intent = new Intent(BananaRoomActivity.this, InataRoomActivity.class);
+                    }else{
+                        intent = new Intent(BananaRoomActivity.this, BananaRoomActivity.class);
+                    }
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+
+                }
+            }
+        }.start();
+    }
+
     public void viewBinds(){
         berhasil=findViewById(R.id.succsestot);
         gagal=findViewById(R.id.failtot);
@@ -264,6 +332,10 @@ public class BananaRoomActivity extends AppCompatActivity {
     /** Called when leaving the activity */
     @Override
     public void onPause() {
+        if(countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
         if (adView != null) {
             adView.pause();
         }
@@ -276,6 +348,11 @@ public class BananaRoomActivity extends AppCompatActivity {
         data();
         super.onResume();
 
+        if(countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
+
         if (adView != null) {
             adView.resume();
         }
@@ -284,6 +361,10 @@ public class BananaRoomActivity extends AppCompatActivity {
     /** Called before the activity is destroyed */
     @Override
     public void onDestroy() {
+        if(countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
         destroyBanner();
         if (adView != null) {
             adView.destroy();
@@ -296,7 +377,7 @@ public class BananaRoomActivity extends AppCompatActivity {
     public void loadMain(){
         Toast.makeText(this, "please wait for loading..", Toast.LENGTH_SHORT).show();
         if(!sedang){
-            loadAd(6);
+            loadAd(banyak);
 
         }
     }
@@ -307,6 +388,7 @@ public class BananaRoomActivity extends AppCompatActivity {
     public void loadAd(int banyak){
         LinearLayout layout = findViewById(R.id.banner_layout);
         layout.removeAllViews();
+        sizebans=6;
         for(int a = 1;a<=banyak;a++) {
             Log.d("BANNER", "loadAd:"+a);
             adView = new AdView(this);
@@ -342,6 +424,8 @@ public class BananaRoomActivity extends AppCompatActivity {
                     berhasilt++;
                     saveInteger(BB, berhasilt, BananaRoomActivity.this);
                     data();
+
+                    StartAutoReload();
                 }
 
                 @Override
@@ -350,6 +434,21 @@ public class BananaRoomActivity extends AppCompatActivity {
                     gagalt++;
                     saveInteger(GG, gagalt, BananaRoomActivity.this);
                     data();
+
+                    if (keepgoing){
+                        AutoReload();
+                    }else{
+                        if (gagalt > maxfail) {
+                            String message;
+                            message = "Maksimal Fail tercukupi : " + gagalt + "/" + maxfail;
+                            if (isTaskRoot()) {
+                                Intent intent = new Intent(BananaRoomActivity.this, MainActivity.class);
+                                startActivity(intent);
+                            }
+
+                            finish(); // Selesai dengan aktivitas ini
+                        }
+                    }
                 }
 
                 @Override
