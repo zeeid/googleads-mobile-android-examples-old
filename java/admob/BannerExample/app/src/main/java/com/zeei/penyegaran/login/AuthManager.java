@@ -95,19 +95,19 @@ public class AuthManager {
                         offlineResponse.put("name", "QA User");
                         offlineResponse.put("email", "qa.user.apps@zeeid.net");
                         offlineResponse.put("jml_baner", 1);
-                        offlineResponse.put("ReLoadBaner", 0);
-                        offlineResponse.put("TimerBaner", 60);
+                        offlineResponse.put("ReLoadBaner", 1);
+                        offlineResponse.put("TimerBaner", 70);
                         offlineResponse.put("SizeBaner", 6);
-                        offlineResponse.put("IsRamdomSizeBaner", 0);
-                        offlineResponse.put("ReLoadInata", 0);
+                        offlineResponse.put("IsRamdomSizeBaner", 1);
+                        offlineResponse.put("ReLoadInata", 1);
                         offlineResponse.put("jml_inata", 1);
                         offlineResponse.put("TimerInata", 60);
                         offlineResponse.put("isClearCache", 0);
                         offlineResponse.put("isVPNProtection", 0);
                         offlineResponse.put("isTestAds", 0);
-                        offlineResponse.put("isAutoLoad", 0);
+                        offlineResponse.put("isAutoLoad", 1); //buat inata
                         offlineResponse.put("isRotation", 0);
-                        offlineResponse.put("isMixadstype", 0);
+                        offlineResponse.put("isMixadstype", 1);
                         offlineResponse.put("isIndoprot", 0);
                         offlineResponse.put("isKeepgoing", 0);
                         offlineResponse.put("isAcakSponsor", 0);
@@ -123,18 +123,28 @@ public class AuthManager {
                                 .put("ca-app-pub-3940256099942544/9214589741")); // Adaptive Banner
 
                         offlineResponse.put("Iklan_Banner_Ukuran_Tetap", new JSONArray()
-                                .put("ca-app-pub-3940256099942544/6300978111")); // Fixed Size Banner
+                                .put("ca-app-pub-9781045687912585/7142179729")
+                                .put("ca-app-pub-9781045687912585/6671272639")
+                                .put("ca-app-pub-9781045687912585/8485889514")
+                                .put("ca-app-pub-9781045687912585/9219939577")
+                                .put("ca-app-pub-9781045687912585/8557594592")
+                                .put("ca-app-pub-9781045687912585/4159184589")
+                                .put("ca-app-pub-9781045687912585/1473758609")
+                                .put("ca-app-pub-9781045687912585/4099921948")
+                                .put("ca-app-pub-9781045687912585/1673069159")
+                                .put("ca-app-pub-9781045687912585/4179365888")
+                                .put("ca-app-pub-9781045687912585/6123002945")); // Fixed Size Banner
 
                         offlineResponse.put("Iklan_Interstisial", new JSONArray()
                                 .put("ca-app-pub-9781045687912585/2799817833")
                                 .put("ca-app-pub-9781045687912585/1351004799")
                                 .put("ca-app-pub-9781045687912585/7571948159")
                                 .put("ca-app-pub-9781045687912585/5485690921")
-//                                .put("ca-app-pub-7944170612384609/5398908827")
-//                                .put("ca-app-pub-7944170612384609/1351852601")
-//                                .put("ca-app-pub-7944170612384609/7638620431")
-//                                .put("ca-app-pub-7944170612384609/6611616825")
-//                                .put("ca-app-pub-7944170612384609/8551685774")
+                                .put("ca-app-pub-9781045687912585/9433317052")
+                                .put("ca-app-pub-9781045687912585/3735393547")
+                                .put("ca-app-pub-9781045687912585/1698281350")
+                                .put("ca-app-pub-9781045687912585/8213694600")
+                                .put("ca-app-pub-9781045687912585/5741484053")
                                 ); // Interstitial
 
                         offlineResponse.put("Iklan_Iklan_Reward", new JSONArray()
