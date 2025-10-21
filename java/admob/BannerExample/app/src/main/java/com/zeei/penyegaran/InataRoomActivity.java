@@ -422,8 +422,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
             } else {
-                appendLog("Gagal: Izin iklan tidak ada. Coba mulai ulang activity.");
-                Toast.makeText(InataRoomActivity.this, "Cannot request ads yet.", Toast.LENGTH_SHORT).show();
+                appendLog("Log : Admob start processing ");
+                loadAdmobAd();
             }
         });
 
@@ -570,7 +570,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 textView.setText("done!");
                 retryButton.setVisibility(View.VISIBLE);
 
-                if(autoclose) {
+                if(autoclose && !mixbanerinter) {
                     retryButton.performClick();
                 }
 
