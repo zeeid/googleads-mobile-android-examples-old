@@ -601,10 +601,10 @@ public class BananaRoomActivity extends AppCompatActivity {
         }
 
         // Set your test devices.
-        MobileAds.setRequestConfiguration(
-                new RequestConfiguration.Builder()
-                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
-                        .build());
+//        MobileAds.setRequestConfiguration(
+//                new RequestConfiguration.Builder()
+//                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
+//                        .build());
 
         // [START initialize_sdk]
         new Thread(
