@@ -94,7 +94,7 @@ public class AuthManager {
                         JSONObject offlineResponse = new JSONObject();
                         offlineResponse.put("name", "QA User");
                         offlineResponse.put("email", "qa.user.apps@zeeid.net");
-                        offlineResponse.put("jml_baner", 1);
+                        offlineResponse.put("jml_baner", 8);
                         offlineResponse.put("ReLoadBaner", 1);
                         offlineResponse.put("TimerBaner", 70);
                         offlineResponse.put("SizeBaner", 6);
