@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -106,6 +108,8 @@ public class BananaRoomActivity extends AppCompatActivity {
         asd=true;
 
         viewBinds();
+        logprogram.setText("");
+        appendLog("Log cleared.");
         data();
 
         SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
@@ -472,6 +476,24 @@ public class BananaRoomActivity extends AppCompatActivity {
         loadNextAd();
     }
 
+    private AdSize getAdSize() {
+        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            getDisplay().getRealMetrics(outMetrics);
+        } else {
+            getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+        }
+
+        float widthPixels = outMetrics.widthPixels;
+        float density = outMetrics.density;
+
+        int adWidth = (int) (widthPixels / density);
+
+        // Step 3 - Get adaptive ad size and return for setting on the ad view.
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
+    }
+
     @SuppressLint("SetTextI18n")
     private void loadNextAd() {
         if (adsLoadedCount >= totalAdsToLoad) {
@@ -488,19 +510,30 @@ public class BananaRoomActivity extends AppCompatActivity {
         TextView sixe = new TextView(this);
         sixe.setText("AdView " + (adsLoadedCount + 1));
 
+        AdSize adSize;
+
         if (sizebans == 1) {
-            adView.setAdSize(AdSize.BANNER);
+            adSize = AdSize.BANNER;
+            appendLog("Ad Size: Banner");
         } else if (sizebans == 2) {
-            adView.setAdSize(AdSize.LARGE_BANNER);
+            adSize = AdSize.LARGE_BANNER;
+            appendLog("Ad Size: Large Banner");
         } else if (sizebans == 3) {
-            adView.setAdSize(AdSize.MEDIUM_RECTANGLE);
+            adSize = AdSize.MEDIUM_RECTANGLE;
+            appendLog("Ad Size: Medium Rectangle");
         } else if (sizebans == 4) {
-            adView.setAdSize(AdSize.FULL_BANNER);
+            adSize = AdSize.FULL_BANNER;
+            appendLog("Ad Size: Full Banner");
         } else if (sizebans == 5) {
-            adView.setAdSize(AdSize.LEADERBOARD);
+            adSize = AdSize.LEADERBOARD;
+            appendLog("Ad Size: Leaderboard");
         } else {
-            adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, 360));
+            adSize = AdSize.BANNER;
+            appendLog("Ad Size: Banner");
+//            adSize = getAdSize();
+//            appendLog("Ad Size: Adaptive");
         }
+        adView.setAdSize(adSize);
 
         AdRequest adRequest = new AdRequest.Builder().build();
 
@@ -523,8 +556,6 @@ public class BananaRoomActivity extends AppCompatActivity {
                 String errorMessage = adError.getMessage();
                 ResponseInfo responseInfo = adError.getResponseInfo();
                 AdError cause = adError.getCause();
-
-                Log.d("Ads", adError.toString());
 
                 appendLog("Ad " + (adsLoadedCount + 1) + " failed to load: " + adError.toString());
                 gagalt++;
