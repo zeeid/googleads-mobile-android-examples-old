@@ -19,9 +19,11 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -29,13 +31,16 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.ResponseInfo;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -61,7 +66,9 @@ public class BananaRoomActivity extends AppCompatActivity {
     private int banyak;
     private int totalAdsToLoad = 0;
     private int adsLoadedCount = 0;
-    TextView berhasil,gagal,auto,jumato,jumbanner,categori,size,tanggalan,adopen,rate;
+    TextView berhasil,gagal,auto,jumato,jumbanner,categori,size,tanggalan,adopen,rate,logprogram;
+
+    private ScrollView logScrollView;
 
     private static final String DATE="yyasd",GG="gsdag",BB="beqrewb",CIK="casdfsc",CT="crewt",IMP="imasfdpr";
 
@@ -313,6 +320,20 @@ public class BananaRoomActivity extends AppCompatActivity {
         size=findViewById(R.id.sizebanner);
         rate=findViewById(R.id.rateSBan);
         tanggalan=findViewById(R.id.tanggal);
+        logprogram = findViewById(R.id.logprogram);
+        logScrollView = findViewById(R.id.logScrollView);
+        clearLogButton = findViewById(R.id.clear_log_button);
+
+        clearLogButton.setOnClickListener(v -> {
+            logprogram.setText("");
+            appendLog("Log cleared.");
+        });
+    }
+
+    private void appendLog(String message) {
+        String timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        logprogram.append(timeStamp + " - " + message + "\n");
+        logScrollView.post(() -> logScrollView.fullScroll(View.FOCUS_DOWN));
     }
 
     public void CekDateUP(){
@@ -441,6 +462,7 @@ public class BananaRoomActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     public void loadAd(int banyak) {
+        appendLog("Starting ad load sequence for " + banyak + " ads.");
         this.totalAdsToLoad = banyak;
         this.adsLoadedCount = 0;
         LinearLayout layout = findViewById(R.id.banner_layout);
@@ -451,12 +473,13 @@ public class BananaRoomActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void loadNextAd() {
         if (adsLoadedCount >= totalAdsToLoad) {
+            appendLog("All ads loaded successfully.");
             StartAutoReload();
             return;
         }
 
         sizebans = GetSizeBaner();
-        Log.d("BANNER", "Loading Ad: " + (adsLoadedCount + 1));
+        appendLog("Loading ad " + (adsLoadedCount + 1) + " of " + totalAdsToLoad);
         adView = new AdView(this);
         adView.setAdUnitId(GetUnitID());
 
@@ -482,6 +505,7 @@ public class BananaRoomActivity extends AppCompatActivity {
         adView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
+                appendLog("Ad " + (adsLoadedCount + 1) + " loaded successfully.");
                 berhasilt++;
                 saveInteger(BB, berhasilt, BananaRoomActivity.this);
                 data();
@@ -492,6 +516,15 @@ public class BananaRoomActivity extends AppCompatActivity {
 
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                String errorDomain = adError.getDomain();
+                int errorCode = adError.getCode();
+                String errorMessage = adError.getMessage();
+                ResponseInfo responseInfo = adError.getResponseInfo();
+                AdError cause = adError.getCause();
+
+                Log.d("Ads", adError.toString());
+
+                appendLog("Ad " + (adsLoadedCount + 1) + " failed to load: " + adError.toString());
                 gagalt++;
                 saveInteger(GG, gagalt, BananaRoomActivity.this);
                 data();
@@ -513,6 +546,7 @@ public class BananaRoomActivity extends AppCompatActivity {
 
             @Override
             public void onAdOpened() {
+                appendLog("Ad opened.");
                 if (countDownTimer != null) {
                     countDownTimer.cancel();
                     countDownTimer = null;
@@ -521,6 +555,7 @@ public class BananaRoomActivity extends AppCompatActivity {
 
             @Override
             public void onAdClicked() {
+                appendLog("Ad clicked.");
                 cik++;
                 saveInteger(CIK, cik, BananaRoomActivity.this);
                 data();
@@ -533,6 +568,7 @@ public class BananaRoomActivity extends AppCompatActivity {
 
             @Override
             public void onAdClosed() {
+                appendLog("Ad closed.");
                 // Code to be executed when the user is about to return
                 // to the app after tapping on an ad.
             }
@@ -605,6 +641,7 @@ public class BananaRoomActivity extends AppCompatActivity {
             return;
         }
 
+        appendLog("Initializing Mobile Ads SDK.");
         // Set your test devices.
 //        MobileAds.setRequestConfiguration(
 //                new RequestConfiguration.Builder()
