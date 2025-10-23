@@ -175,7 +175,7 @@ public class BananaRoomActivity extends AppCompatActivity {
                     }
 
                     if (googleMobileAdsConsentManager.canRequestAds()) {
-                        initializeMobileAdsSdk();
+                        loadMain();
                     }
 
                     if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
@@ -186,7 +186,7 @@ public class BananaRoomActivity extends AppCompatActivity {
 
         // This sample attempts to load ads using consent obtained in the previous session.
         if (googleMobileAdsConsentManager.canRequestAds()) {
-            initializeMobileAdsSdk();
+            loadMain();
         }
     }
 
@@ -636,31 +636,5 @@ public class BananaRoomActivity extends AppCompatActivity {
 
         Intent intent = new Intent(context, BananaRoomActivity.class);
         context.startActivity(intent);
-    }
-
-    private void initializeMobileAdsSdk() {
-        if (isMobileAdsInitializeCalled.getAndSet(true)) {
-            return;
-        }
-
-        appendLog("Initializing Mobile Ads SDK.");
-        // Set your test devices.
-//        MobileAds.setRequestConfiguration(
-//                new RequestConfiguration.Builder()
-//                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
-//                        .build());
-
-        // [START initialize_sdk]
-        new Thread(
-                () -> {
-                    // Initialize the Google Mobile Ads SDK on a background thread.
-                    MobileAds.initialize(this, initializationStatus -> {});
-                    // [START_EXCLUDE silent]
-                    // Load an ad on the main thread.
-                    runOnUiThread(this::loadMain);
-                    // [END_EXCLUDE]
-                })
-                .start();
-        // [END initialize_sdk]
     }
 }

@@ -297,7 +297,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                     if (googleMobileAdsConsentManager.canRequestAds()) {
                         // Cukup panggil inisialisasi di sini.
                         // Proses loadAd() akan otomatis dijalankan setelah inisialisasi selesai.
-                        initializeMobileAdsSdk();
+                        loadAd();
                     }
 
                     if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
@@ -668,34 +668,6 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             countDownTimer.cancel();
         }
         gamePaused = true;
-    }
-
-    private void initializeMobileAdsSdk() {
-        appendLog("Admob Initialize Checking");
-        if (isMobileAdsInitializeCalled.getAndSet(true)) {
-            if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
-                appendLog("Admob Ready to Show");
-                loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
-            } else {
-                appendLog("Gagal: Izin iklan tidak ada. Coba mulai ulang activity.");
-                Toast.makeText(InataRoomActivity.this, "Cannot request ads yet.", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else{
-            appendLog("Admob Initialize Called");
-            MobileAds.initialize(this, initializationStatus -> {
-                // Initialization is complete. Now load the ad.
-                loadAd();
-            });
-        }
-
-        // Set your test devices.
-//        MobileAds.setRequestConfiguration(
-//                new RequestConfiguration.Builder()
-//                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
-//                        .build());
-
-
     }
 
     public void countDownTimeAR(){

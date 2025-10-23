@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -284,6 +285,28 @@ public class MainActivity extends AppCompatActivity {
         cekIp();
         setSystemTimeZoneByIP(MainActivity.this);
 
+        // Initialize the Google Mobile Ads SDK.
+        googleMobileAdsConsentManager =
+                GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
+
+        googleMobileAdsConsentManager.gatherConsent(
+                this,
+                consentError -> {
+                    if (consentError != null) {
+                        Log.w(
+                                TAG,
+                                String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
+                    }
+
+                    if (googleMobileAdsConsentManager.canRequestAds()) {
+                        initializeMobileAdsSdk();
+                    }
+                });
+
+        if (googleMobileAdsConsentManager.canRequestAds()) {
+            initializeMobileAdsSdk();
+        }
+
         Button buttonInata = findViewById(R.id.buttoninata);
         buttonInata.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -352,6 +375,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void initializeMobileAdsSdk() {
+        if (isMobileAdsInitializeCalled.getAndSet(true)) {
+            return;
+        }
+        // Initialize the Google Mobile Ads SDK on a background thread.
+        new Thread(
+                        () -> {
+                            MobileAds.initialize(this, initializationStatus -> {
+                                // MobileAds.initialize() must be called on the main thread.
+                                runOnUiThread(() -> {
+                                    Toast.makeText(MainActivity.this, "Ads are ready to be loaded.", Toast.LENGTH_SHORT).show();
+                                    Log.d("ADMOB", "Ads are ready to be loaded.");
+                                });
+                            });
+                        })
+                .start();
     }
 
 
