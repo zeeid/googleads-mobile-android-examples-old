@@ -59,6 +59,8 @@ public class BananaRoomActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private int sizebans;
     private int banyak;
+    private int totalAdsToLoad = 0;
+    private int adsLoadedCount = 0;
     TextView berhasil,gagal,auto,jumato,jumbanner,categori,size,tanggalan,adopen,rate;
 
     private static final String DATE="yyasd",GG="gsdag",BB="beqrewb",CIK="casdfsc",CT="crewt",IMP="imasfdpr";
@@ -399,34 +401,38 @@ public class BananaRoomActivity extends AppCompatActivity {
 
         String randomAdCode = "";
 
-        // Mengambil SharedPreferences
-        SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
+        if(usetestunit){
+            randomAdCode = AD_UNIT_ID;
+        } else {
+            // Mengambil SharedPreferences
+            SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
 
-        // Mengambil array ads sebagai Set
-        Set<String> layarPembukaAplikasiSet = sharedPref.getStringSet("Iklan_Banner_Ukuran_Tetap", new HashSet<>());
+            // Mengambil array ads sebagai Set
+            Set<String> layarPembukaAplikasiSet = sharedPref.getStringSet("Iklan_Banner_Ukuran_Tetap", new HashSet<>());
 
-        // Konversi Set menjadi array
-        String[] layarPembukaAplikasiArray = layarPembukaAplikasiSet.toArray(new String[0]);
+            // Konversi Set menjadi array
+            String[] layarPembukaAplikasiArray = layarPembukaAplikasiSet.toArray(new String[0]);
 
-        // Memilih adCode secara random jika ada data
-        if (layarPembukaAplikasiArray.length > 0) {
-            Random random = new Random();
-            int randomIndex = random.nextInt(layarPembukaAplikasiArray.length);
+            // Memilih adCode secara random jika ada data
+            if (layarPembukaAplikasiArray.length > 0) {
+                Random random = new Random();
+                int randomIndex = random.nextInt(layarPembukaAplikasiArray.length);
 
-            AcakSponsor     = (sharedPref.getInt("isAcakSponsor", 0) == 1 );
+                AcakSponsor     = (sharedPref.getInt("isAcakSponsor", 0) == 1 );
 
-            if (AcakSponsor){
-                randomAdCode = layarPembukaAplikasiArray[randomIndex];
-            }else{
-                if(layarPembukaAplikasiArray.length > 1){
-                    randomAdCode = layarPembukaAplikasiArray[0];
+                if (AcakSponsor){
+                    randomAdCode = layarPembukaAplikasiArray[randomIndex];
                 }else{
-                    randomAdCode = layarPembukaAplikasiArray[0];
+                    if(layarPembukaAplikasiArray.length > 1){
+                        randomAdCode = layarPembukaAplikasiArray[0];
+                    }else{
+                        randomAdCode = layarPembukaAplikasiArray[0];
+                    }
                 }
-            }
 
-            // Menampilkan adCode random
-            Log.d("AnotherActivity", "Random Ad Code: " + randomAdCode);
+                // Menampilkan adCode random
+                Log.d("AnotherActivity", "Random Ad Code: " + randomAdCode);
+            }
         }
 
         return randomAdCode;
@@ -434,109 +440,108 @@ public class BananaRoomActivity extends AppCompatActivity {
 
 
     @SuppressLint("SetTextI18n")
-    public void loadAd(int banyak){
+    public void loadAd(int banyak) {
+        this.totalAdsToLoad = banyak;
+        this.adsLoadedCount = 0;
         LinearLayout layout = findViewById(R.id.banner_layout);
         layout.removeAllViews();
+        loadNextAd();
+    }
 
-        for(int a = 1;a<=banyak;a++) {
-            sizebans= GetSizeBaner();
-            Log.d("BANNER", "loadAd:"+a);
-            adView = new AdView(this);
-            adView.setAdUnitId(GetUnitID());
+    @SuppressLint("SetTextI18n")
+    private void loadNextAd() {
+        if (adsLoadedCount >= totalAdsToLoad) {
+            StartAutoReload();
+            return;
+        }
 
+        sizebans = GetSizeBaner();
+        Log.d("BANNER", "Loading Ad: " + (adsLoadedCount + 1));
+        adView = new AdView(this);
+        adView.setAdUnitId(GetUnitID());
 
-            TextView sixe =new TextView(this);
-            sixe.setText("AdView "+a);
+        TextView sixe = new TextView(this);
+        sixe.setText("AdView " + (adsLoadedCount + 1));
 
-            if(sizebans==1){
-                adView.setAdSize(AdSize.BANNER);
-            }else if(sizebans==2){
-                adView.setAdSize(AdSize.LARGE_BANNER);
-            }else if(sizebans==3){
-                adView.setAdSize(AdSize.MEDIUM_RECTANGLE);
-            }else if(sizebans==4){
-                adView.setAdSize(AdSize.FULL_BANNER);
-            }else if(sizebans==5){
-                adView.setAdSize(AdSize.LEADERBOARD);
-            }else{
-                // Request an anchored adaptive banner with a width of 360.
-                adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, 360));
+        if (sizebans == 1) {
+            adView.setAdSize(AdSize.BANNER);
+        } else if (sizebans == 2) {
+            adView.setAdSize(AdSize.LARGE_BANNER);
+        } else if (sizebans == 3) {
+            adView.setAdSize(AdSize.MEDIUM_RECTANGLE);
+        } else if (sizebans == 4) {
+            adView.setAdSize(AdSize.FULL_BANNER);
+        } else if (sizebans == 5) {
+            adView.setAdSize(AdSize.LEADERBOARD);
+        } else {
+            adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, 360));
+        }
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                berhasilt++;
+                saveInteger(BB, berhasilt, BananaRoomActivity.this);
+                data();
+
+                adsLoadedCount++;
+                loadNextAd();
             }
 
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                gagalt++;
+                saveInteger(GG, gagalt, BananaRoomActivity.this);
+                data();
 
-
-            AdRequest adRequest = new AdRequest.Builder().build();
-
-            adView.setAdListener(new AdListener() {
-                @Override
-                public void onAdLoaded() {
-                    // Code to be executed when an ad finishes loading.
-                    berhasilt++;
-                    saveInteger(BB, berhasilt, BananaRoomActivity.this);
-                    data();
-
-                    StartAutoReload();
-                }
-
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                    // Code to be executed when an ad request fails.
-                    gagalt++;
-                    saveInteger(GG, gagalt, BananaRoomActivity.this);
-                    data();
-
-                    if (keepgoing){
-                        AutoReload();
-                    }else{
-                        if (gagalt > maxfail) {
-                            String message;
-                            message = "Maksimal Fail tercukupi : " + gagalt + "/" + maxfail;
-                            if (isTaskRoot()) {
-                                Intent intent = new Intent(BananaRoomActivity.this, MainActivity.class);
-                                startActivity(intent);
-                            }
-
-                            finish(); // Selesai dengan aktivitas ini
+                if (keepgoing) {
+                    AutoReload();
+                } else {
+                    if (gagalt > maxfail) {
+                        String message;
+                        message = "Maksimal Fail tercukupi : " + gagalt + "/" + maxfail;
+                        if (isTaskRoot()) {
+                            Intent intent = new Intent(BananaRoomActivity.this, MainActivity.class);
+                            startActivity(intent);
                         }
+                        finish();
                     }
                 }
+            }
 
-                @Override
-                public void onAdOpened() {
-                    // Code to be executed when an ad opens an overlay that
-                    // covers the screen.
-
-                    if(countDownTimer != null) {
-                        countDownTimer.cancel();
-                        countDownTimer = null;
-                    }
+            @Override
+            public void onAdOpened() {
+                if (countDownTimer != null) {
+                    countDownTimer.cancel();
+                    countDownTimer = null;
                 }
+            }
 
-                @Override
-                public void onAdClicked() {
-                    // Code to be executed when the user clicks on an ad.
-                    cik++;
-                    saveInteger(CIK, cik, BananaRoomActivity.this);
-                    data();
+            @Override
+            public void onAdClicked() {
+                cik++;
+                saveInteger(CIK, cik, BananaRoomActivity.this);
+                data();
 
-                    if(countDownTimer != null) {
-                        countDownTimer.cancel();
-                        countDownTimer = null;
-                    }
+                if (countDownTimer != null) {
+                    countDownTimer.cancel();
+                    countDownTimer = null;
                 }
+            }
 
-                @Override
-                public void onAdClosed() {
-                    // Code to be executed when the user is about to return
-                    // to the app after tapping on an ad.
-                }
-            });
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
 
-
-            layout.addView(sixe);
-            layout.addView(adView);
-            adView.loadAd(adRequest);
-        }
+        LinearLayout layout = findViewById(R.id.banner_layout);
+        layout.addView(sixe);
+        layout.addView(adView);
+        adView.loadAd(adRequest);
     }
 
     public void destroyBanner() {
