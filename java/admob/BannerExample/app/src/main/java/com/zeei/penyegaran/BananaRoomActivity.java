@@ -165,33 +165,8 @@ public class BananaRoomActivity extends AppCompatActivity {
 
         // Log the Mobile Ads SDK version.
         Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
-
-        googleMobileAdsConsentManager =
-                GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
-        googleMobileAdsConsentManager.gatherConsent(
-                this,
-                consentError -> {
-                    if (consentError != null) {
-                        // Consent not obtained in current session.
-                        Log.w(
-                                TAG,
-                                String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
-                    }
-
-                    if (googleMobileAdsConsentManager.canRequestAds()) {
-                        loadMain();
-                    }
-
-                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
-                        // Regenerate the options menu to include a privacy setting.
-                        invalidateOptionsMenu();
-                    }
-                });
-
-        // This sample attempts to load ads using consent obtained in the previous session.
-        if (googleMobileAdsConsentManager.canRequestAds()) {
-            loadMain();
-        }
+        appendLog("Google Mobile Ads SDK Version: " + MobileAds.getVersion());
+        loadMain();
     }
 
 
@@ -557,7 +532,7 @@ public class BananaRoomActivity extends AppCompatActivity {
                 ResponseInfo responseInfo = adError.getResponseInfo();
                 AdError cause = adError.getCause();
 
-                appendLog("Ad " + (adsLoadedCount + 1) + " failed to load: " + adError.toString());
+                appendLog("Ad " + (adsLoadedCount + 1) + " failed to load: " + errorDomain + " - " + errorCode + " - " + errorMessage);
                 gagalt++;
                 saveInteger(GG, gagalt, BananaRoomActivity.this);
                 data();
