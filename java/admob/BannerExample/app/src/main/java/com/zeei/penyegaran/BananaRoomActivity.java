@@ -456,6 +456,8 @@ public class BananaRoomActivity extends AppCompatActivity {
             }
         }
 
+        appendLog("Ad Code: "+randomAdCode);
+
         return randomAdCode;
     }
 
