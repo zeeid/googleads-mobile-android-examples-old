@@ -271,18 +271,17 @@ public class BananaRoomActivity extends AppCompatActivity {
                         adView.destroy();
                     }
 
-                    // Menutup aktivitas saat ini
-                    finish();
                     Intent intent;
                     if (mixbanerinter){
-                        // Membuka BananaFixedActivity
+                        // Membuka InataRoomActivity
                         intent = new Intent(BananaRoomActivity.this, InataRoomActivity.class);
                     }else{
                         intent = new Intent(BananaRoomActivity.this, BananaRoomActivity.class);
                     }
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-
+                    // Menutup aktivitas saat ini
+                    finish();
                 }
             }
         }.start();

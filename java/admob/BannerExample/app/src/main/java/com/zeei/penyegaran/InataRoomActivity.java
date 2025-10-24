@@ -683,10 +683,6 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                 public void onFinish() {
                     if (autoclose) {
-                        onBackPressed();
-                        // Close the current activity
-                        finish();
-
                         if (countDownTimerAR != null) {
                             countDownTimerAR.cancel();
                             countDownTimerAR = null;
@@ -694,14 +690,17 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                         Intent intent;
                         if (mixbanerinter) {
-                            // Open BananaFixedActivity (You might want to change this to BananaFixedActivity)
+                            // Open BananaRoomActivity
                             intent = new Intent(InataRoomActivity.this, BananaRoomActivity.class);
                         } else {
-                            // Open InataRoomActivity (stays the same)
-                            intent = new Intent(InataRoomActivity.this, InataRoomActivity_level1.class);
+                            // Open InataRoomActivity again
+                            intent = new Intent(InataRoomActivity.this, InataRoomActivity.class);
                         }
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
+
+                        // Close the current activity
+                        finish();
                     }
                 }
             }.start();
