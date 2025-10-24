@@ -514,9 +514,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                         InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed,InataRoomActivity.this);
                                         dataC();
 
-                                        if(autoclose) {
-                                            countDownTimeAR();
-                                        }
+
                                     }
 
                                     @Override
@@ -527,6 +525,10 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                         show++;
                                         InterstialMe.saveInteger(InterstialMe.SHOW,show,InataRoomActivity.this);
                                         dataC();
+
+                                        if(autoclose) {
+                                            countDownTimeAR();
+                                        }
                                     }
                                 });
 
