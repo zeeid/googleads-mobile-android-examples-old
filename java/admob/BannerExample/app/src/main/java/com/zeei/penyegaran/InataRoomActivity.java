@@ -615,6 +615,25 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     }
 
     @Override
+    protected void onDestroy() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        if (countDownTimerAR != null) {
+            countDownTimerAR.cancel();
+        }
+        
+        // Hancurkan referensi AdMob Interstitial Ad
+        interstitialAd = null;
+
+        // Untuk Unity Ads, tidak ada metode destroy() per iklan interstisial.
+        // SDK Unity Ads menangani siklus hidupnya sendiri dan listener akan
+        // otomatis dibersihkan saat Activity dihancurkan.
+
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_menu, menu);
         MenuItem moreMenu = menu.findItem(R.id.action_more);
@@ -784,13 +803,13 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         reload=getBool(RELOADE,this);
 
         tanggalan.setText("Estimates calculation in :\n"+InterstialMe.getString(InterstialMe.DATE,this));
-        if((sharedPref.getInt("ReLoadInata", 0) == 1 )){
+        if((sharedPref.getInt("ReLoadInata", 0) == 1 )) {
             auto.setText("AUTO RELOAD ACTIVE");
         }else {
             auto.setText("AUTO RELOAD OFF");
             times.setText("");
         }
-        if((sharedPref.getInt("ReLoadInata", 0) == 1 )){
+        if((sharedPref.getInt("ReLoadInata", 0) == 1 )) {
             close.setText("AUTO CLOSE ACTIVE ");
         }else{
             close.setText("AUTO CLOSE OFF");
@@ -816,7 +835,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     public void CekDateUP(){
         @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy");
         String date = df.format(Calendar.getInstance().getTime());
-        if(!date.equals(InterstialMe.getString(InterstialMe.DATE,this))){
+        if(!date.equals(InterstialMe.getString(InterstialMe.DATE,this))) {
             InterstialMe.saveString(InterstialMe.DATE,date,this);
             resetResult();
 
