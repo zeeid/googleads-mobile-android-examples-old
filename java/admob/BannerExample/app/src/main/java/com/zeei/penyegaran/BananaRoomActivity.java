@@ -90,14 +90,16 @@ public class BananaRoomActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        
         if(countDownTimer != null) {
             countDownTimer.cancel();
             countDownTimer = null;
         }
         destroyBanner();
-        finish();
         asd=false;
+        finish();
+        super.onBackPressed();
+        
     }
 
     @Override
