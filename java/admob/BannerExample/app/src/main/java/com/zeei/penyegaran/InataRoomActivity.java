@@ -86,9 +86,9 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     public final String RELOADE="reload";
     public boolean reload=false,autoclose,autoreload,IsIndo, IsAdmob=true;
-    public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor;
-    public int maxsuccess = 1, maxfail = 1, isAutoLoad = 0;
-    public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60;
+    public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor,isMultiAdsNetwork,isFailOverMultiNetwork;
+    public int maxsuccess = 1, maxfail = 1, isAutoLoad = 0, isFailOverMaxCount = 4;
+    public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60,failovercount=0;
     public String ratess,AdsUnitID;
     Button sett;
     Button clearLogButton, loadAdmobButton, loadUnityButton;
@@ -180,6 +180,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     private IUnityAdsLoadListener loadListener = new IUnityAdsLoadListener() {
         @Override
         public void onUnityAdsAdLoaded(String placementId) {
+            failovercount = 0;
             UnityAds.show(InataRoomActivity.this, placementId, new UnityAdsShowOptions(), showListener);
             berhasilt++;
             InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity.this);
@@ -189,10 +190,18 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         @Override
         public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
             Log.e("UnityAdsExample", "Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
-
             appendLog("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
             categori.setText("Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
-            //loadAdmobAd();
+            if (isFailOverMultiNetwork) {
+                failovercount++;
+                if (failovercount < isFailOverMaxCount) {
+                    appendLog("Log : Mencoba Load Network Lain ke "+failovercount);
+                    loadAdmobAd();
+                } else {
+                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                    Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     };
 
@@ -316,6 +325,19 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         }
     }
 
+    private void loadAds() {
+        if (isMultiAdsNetwork) {
+            boolean useAdmob = random.nextBoolean();
+            if (useAdmob) {
+                loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
+            } else {
+                loadUnityAd(); // Panggil fungsi untuk memuat Unity
+            }
+        } else {
+            loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -333,7 +355,10 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         vpnprot         = (sharedPref.getInt("isVPNProtection", 0) == 1 );;
         indoprot        = (sharedPref.getInt("isIndoprot", 0) == 1 );
         keepgoing       = (sharedPref.getInt("isKeepgoing", 0) == 1 );
-        
+        isMultiAdsNetwork       = (sharedPref.getInt("isMultiAdsNetwork", 0) == 1 );
+        isFailOverMultiNetwork  = (sharedPref.getInt("isFailOverMultiNetwork", 0) == 1 );
+
+        isFailOverMaxCount  = sharedPref.getInt("isFailOverMaxCount", 4);
         maxsuccess  = sharedPref.getInt("maxsuccess", 0);
         maxfail     = sharedPref.getInt("maxfail", 0);
         isAutoLoad  = sharedPref.getInt("isAutoLoad", 0);
@@ -363,13 +388,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         }
 
         if(isAutoLoad == 1) {
-            if (useAdmob) {
-                appendLog("Log : Admob start processing ");
-                loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
-            } else {
-                appendLog("Log : UnityAds start processing ");
-                loadUnityAd(); // Panggil fungsi untuk memuat Unity
-            }
+            loadAds();
         }
 
         retryButton = findViewById(R.id.retry_button);
@@ -377,14 +396,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean useAdmob = random.nextBoolean();
-                if (useAdmob) {
-                    appendLog("Log : Admob start processing ");
-                    loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
-                } else {
-                    appendLog("Log : UnityAds start processing ");
-                    loadUnityAd(); // Panggil fungsi untuk memuat Unity
-                }
+                loadAds();
             }
         });
 
@@ -452,6 +464,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        failovercount = 0;
                         // The mInterstitialAd reference will be null until
                         // an ad is loaded.
                         InataRoomActivity.this.interstitialAd = interstitialAd;
@@ -523,7 +536,16 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        //loadUnityAd();
+                        if (isFailOverMultiNetwork) {
+                            failovercount++;
+                            if (failovercount < isFailOverMaxCount) {
+                                appendLog("Log : Mencoba Load Network Lain ke "+failovercount);
+                                loadUnityAd();
+                            } else {
+                                appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                                Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
+                            }
+                        }
 
                         // Handle the error
                         Log.i(TAG, loadAdError.getMessage());

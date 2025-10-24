@@ -55,6 +55,7 @@ public class AuthManager {
                         offlineResponse.put("isAcakSponsor", 0); // untuk acak Unit AD ID
                         offlineResponse.put("isMultiAdsNetwork",0); // untuk load admob dan unity dll jika 1 maka pilih random, jika 0 default admob
                         offlineResponse.put("isFailOverMultiNetwork",0); // untuk re load network yg lain jika network pertama gagal load
+                        offlineResponse.put("isFailOverMaxCount",4); // Jika gagal load di multi network failover sebanyak 4x maka stop load ads baik unity atau admob dan tampilkan notif 'gagal failover load multi network check internet / akun nya kena limit'
                         offlineResponse.put("maxsuccess", 10);
                         offlineResponse.put("maxfail", 10);
 
@@ -113,8 +114,9 @@ public class AuthManager {
                         offlineResponse.put("isIndoprot", 0);
                         offlineResponse.put("isKeepgoing", 0);
                         offlineResponse.put("isAcakSponsor", 1); // untuk acak Unit AD ID
-                        offlineResponse.put("isMultiAdsNetwork",0); // untuk load admob dan unity dll jika 1 maka pilih random, jika 0 default admob
-                        offlineResponse.put("isFailOverMultiNetwork",0); // untuk re load network yg lain jika network pertama gagal load
+                        offlineResponse.put("isMultiAdsNetwork",1); // untuk load admob dan unity dll jika 1 maka pilih random, jika 0 default admob
+                        offlineResponse.put("isFailOverMultiNetwork",1); // untuk re load network yg lain jika network pertama gagal load
+                        offlineResponse.put("isFailOverMaxCount",4); // Jika gagal load di multi network failover sebanyak 4x maka stop load ads baik unity atau admob dan tampilkan notif 'gagal failover load multi network check internet / akun nya kena limit'
                         offlineResponse.put("maxsuccess", 100);
                         offlineResponse.put("maxfail", 10);
 
