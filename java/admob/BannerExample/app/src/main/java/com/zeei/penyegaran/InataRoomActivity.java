@@ -113,22 +113,22 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     @Override
     public void onBackPressed() {
-        if(countDownTimerAR != null) {
-            countDownTimerAR.cancel();
-            countDownTimerAR = null;
-        }
+       if(countDownTimerAR != null) {
+           countDownTimerAR.cancel();
+           countDownTimerAR = null;
+       }
 
 
-        if (isTaskRoot()) {
-            // Jika aktivitas ini adalah aktivitas teratas (tidak ada aktivitas lain dalam tumpukan)
-            // tambahkan logika untuk membuka menu Home activity atau lakukan tindakan yang sesuai.
-            // Misalnya:
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            finish(); // Selesai dengan aktivitas ini
-        } else {
-            super.onBackPressed(); // Panggil perilaku default jika tidak ada dalam tumpukan teratas
-        }
+       if (isTaskRoot()) {
+           // Jika aktivitas ini adalah aktivitas teratas (tidak ada aktivitas lain dalam tumpukan)
+           // tambahkan logika untuk membuka menu Home activity atau lakukan tindakan yang sesuai.
+           // Misalnya:
+           Intent intent = new Intent(this, MainActivity.class);
+           startActivity(intent);
+           finish(); // Selesai dengan aktivitas ini
+       } else {
+           super.onBackPressed(); // Panggil perilaku default jika tidak ada dalam tumpukan teratas
+       }
     }
 
     public String GetUnitID() {
@@ -594,7 +594,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 textView.setText("done!");
                 retryButton.setVisibility(View.VISIBLE);
 
-                if(autoclose && !mixbanerinter) {
+                if(autoclose && !mixbanerinter && countDownTimerAR == null) {
                     retryButton.performClick();
                 }
 
