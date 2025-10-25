@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -258,6 +259,10 @@ public class MainActivity extends AppCompatActivity {
                     // Hapus semua data SharedPreferences
                     SharedPreferences settings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                     settings.edit().clear().apply();
+
+                    // Hapus data SharedPreferences default
+                    SharedPreferences defaultPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    defaultPrefs.edit().clear().apply();
 
                     // Pindah ke LoginActivity dan hapus semua activity sebelumnya
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
