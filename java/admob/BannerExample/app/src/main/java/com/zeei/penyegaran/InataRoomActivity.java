@@ -327,13 +327,17 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     private void loadAds() {
         if (isMultiAdsNetwork) {
+            appendLog("Log : Start MultiAdsNetwork ");
             boolean useAdmob = random.nextBoolean();
             if (useAdmob) {
+                appendLog("Log : Start Admob ");
                 loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
             } else {
+                appendLog("Log : Start Unity ");
                 loadUnityAd(); // Panggil fungsi untuk memuat Unity
             }
         } else {
+            appendLog("Log : Start Single Admob ");
             loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
         }
     }

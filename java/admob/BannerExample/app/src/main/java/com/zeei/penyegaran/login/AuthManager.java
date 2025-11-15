@@ -98,7 +98,7 @@ public class AuthManager {
                         offlineResponse.put("name", "QA User");
                         offlineResponse.put("email", "qa.user.apps@zeeid.net");
                         offlineResponse.put("jml_baner", 8);
-                        offlineResponse.put("ReLoadBaner", 1);
+                        offlineResponse.put("ReLoadBaner", 0);
                         offlineResponse.put("TimerBaner", 70);
                         offlineResponse.put("SizeBaner", 6);
                         offlineResponse.put("IsRamdomSizeBaner", 1);
@@ -117,8 +117,8 @@ public class AuthManager {
                         offlineResponse.put("isMultiAdsNetwork",1); // untuk load admob dan unity dll jika 1 maka pilih random, jika 0 default admob
                         offlineResponse.put("isFailOverMultiNetwork",1); // untuk re load network yg lain jika network pertama gagal load
                         offlineResponse.put("isFailOverMaxCount",4); // Jika gagal load di multi network failover sebanyak 4x maka stop load ads baik unity atau admob dan tampilkan notif 'gagal failover load multi network check internet / akun nya kena limit'
-                        offlineResponse.put("maxsuccess", 100);
-                        offlineResponse.put("maxfail", 10);
+                        offlineResponse.put("maxsuccess", 100000);
+                        offlineResponse.put("maxfail", 100000);
 
                         // Simulasi array iklan
                         offlineResponse.put("Iklan_Layar_Pembuka_Aplikasi", new JSONArray()
@@ -244,6 +244,9 @@ public class AuthManager {
             editor.putInt("isIndoprot", jsonResponse.getInt("isIndoprot"));
             editor.putInt("isKeepgoing", jsonResponse.getInt("isKeepgoing"));
             editor.putInt("isAcakSponsor", jsonResponse.getInt("isAcakSponsor"));
+            editor.putInt("isMultiAdsNetwork", jsonResponse.getInt("isMultiAdsNetwork"));
+            editor.putInt("isFailOverMultiNetwork", jsonResponse.getInt("isFailOverMultiNetwork"));
+            editor.putInt("isFailOverMaxCount", jsonResponse.getInt("isFailOverMaxCount"));
             editor.putInt("maxsuccess", jsonResponse.getInt("maxsuccess"));
             editor.putInt("maxfail", jsonResponse.getInt("maxfail"));
 
