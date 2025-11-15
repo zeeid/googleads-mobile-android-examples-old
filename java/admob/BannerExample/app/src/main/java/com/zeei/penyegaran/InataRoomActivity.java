@@ -96,7 +96,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     private ScrollView logScrollView;
 
-    private String unityGameID = "5855626";
+    private String unityGameID = getString(R.string.unity_game_id);
     private Boolean testMode = false;
     //private String adUnitId = "Interstitial_Android";
     private final String[] unityAdUnitIds = {
