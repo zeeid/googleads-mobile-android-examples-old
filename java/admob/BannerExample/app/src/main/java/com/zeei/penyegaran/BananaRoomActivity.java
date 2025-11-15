@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +35,11 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.ResponseInfo;
+import com.unity3d.ads.IUnityAdsInitializationListener;
+import com.unity3d.ads.UnityAds;
+import com.unity3d.services.banners.BannerErrorInfo;
+import com.unity3d.services.banners.BannerView;
+import com.unity3d.services.banners.UnityBannerSize;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -47,7 +53,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BananaRoomActivity extends AppCompatActivity {
+public class BananaRoomActivity extends AppCompatActivity implements IUnityAdsInitializationListener {
     // Check your logcat output for the test device hashed ID e.g.
     // "Use RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("ABCDEF012345"))
     // to get test ads on this device" or
@@ -81,12 +87,34 @@ public class BananaRoomActivity extends AppCompatActivity {
 
 
     public final String RELOADE="reload";
-    public boolean isTimerJalan=false, reload=false,autoclose,autoreload,IsIndo, IsAdmob=true;
+    public boolean isTimerJalan=false, reload=false,autoclose,autoreload,IsIndo, IsAdmob=false;
     public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor;
     public int maxsuccess = 1, maxfail = 1, isAutoLoad = 0;
 
     Button sett;
     Button clearLogButton, loadAdmobButton, loadUnityButton;
+
+    // Unity Ads fields
+    private String unityGameID;
+    private Boolean testMode = true;
+//    private String unityBannerAdUnitId = "Banner_Android"; // Example Ad Unit ID from Unity docs
+    private final String[] unityAdUnitIds = {
+            "Banner_Android",
+            "Banner_Android_Bidding",
+    };
+    private BannerView unityBannerView;
+    private int unityAdsLoadedCount = 0;
+    boolean startUnityLoadAfterInit = false;
+    Random random = new Random();
+
+    private String getRandomUnityAdUnitId() {
+        // Memilih indeks acak dari 0 sampai (panjang array - 1)
+        int randomIndex = random.nextInt(unityAdUnitIds.length);
+        String selectedAdUnitId = unityAdUnitIds[randomIndex];
+        Log.d(TAG, "Menggunakan Unity Ad Unit ID: " + selectedAdUnitId);
+        appendLog("Log: Memilih Unity Ad Unit ID: " + selectedAdUnitId);
+        return selectedAdUnitId;
+    }
 
     @Override
     public void onBackPressed() {
@@ -106,6 +134,7 @@ public class BananaRoomActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room_banana);
+        unityGameID = getString(R.string.unity_game_id);
         CekDateUP();
         asd=true;
 
@@ -165,9 +194,18 @@ public class BananaRoomActivity extends AppCompatActivity {
         }
 
 
-        // Log the Mobile Ads SDK version.
-        Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
-        appendLog("Google Mobile Ads SDK Version: " + MobileAds.getVersion());
+        if (IsAdmob) {
+            // Log the Mobile Ads SDK version.
+            Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
+            appendLog("Google Mobile Ads SDK Version: " + MobileAds.getVersion());
+        } else {
+            appendLog("Unity Ads is selected.");
+            if (!UnityAds.isInitialized()) {
+                UnityAds.initialize(getApplicationContext(), unityGameID, testMode, this);
+                appendLog("Log : UnityAds initialize... ");
+            }
+
+        }
         loadMain();
     }
 
@@ -272,6 +310,9 @@ public class BananaRoomActivity extends AppCompatActivity {
                     if (adView != null) {
                         adView.destroy();
                     }
+                     if (unityBannerView != null) {
+                        unityBannerView.destroy();
+                    }
 
                     Intent intent;
                     if (mixbanerinter){
@@ -368,13 +409,15 @@ public class BananaRoomActivity extends AppCompatActivity {
             countDownTimer = null;
         }
         destroyBanner();
+        if (unityBannerView != null) {
+            unityBannerView.destroy();
+        }
+        unityBannerView = null;
         if (adView != null) {
             adView.destroy();
         }
         super.onDestroy();
     }
-
-
 
     public void loadMain(){
         Toast.makeText(this, "please wait for loading..", Toast.LENGTH_SHORT).show();
@@ -387,9 +430,9 @@ public class BananaRoomActivity extends AppCompatActivity {
     public int GetSizeBaner (){
         SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
         int SizeValue;
-        if ((sharedPref.getInt("IsRamdomSizeBaner", 0) == 1 )){
+        if ((sharedPref.getInt("IsRamdomSizeBaner", 0) == 1 )) {
             SizeValue = new Random().nextInt(6) + 1;
-        }else{
+        } else {
             SizeValue = SizeBaner;
         }
 
@@ -440,15 +483,27 @@ public class BananaRoomActivity extends AppCompatActivity {
         return randomAdCode;
     }
 
-
     @SuppressLint("SetTextI18n")
     public void loadAd(int banyak) {
-        appendLog("Starting ad load sequence for " + banyak + " ads.");
         this.totalAdsToLoad = banyak;
         this.adsLoadedCount = 0;
+        this.unityAdsLoadedCount = 0;
+
         LinearLayout layout = findViewById(R.id.banner_layout);
         layout.removeAllViews();
-        loadNextAd();
+
+        if (IsAdmob) {
+            appendLog("Starting AdMob ad load sequence for " + banyak + " ads.");
+            loadNextAd();
+        } else {
+            appendLog("Starting Unity ad load sequence for " + banyak + " ads.");
+            if (UnityAds.isInitialized()) {
+                loadNextUnityAd();
+            } else {
+                appendLog("Unity Ads is not initialized. Waiting for initialization to complete.");
+                startUnityLoadAfterInit = true;
+            }
+        }
     }
 
     private AdSize getAdSize() {
@@ -642,5 +697,80 @@ public class BananaRoomActivity extends AppCompatActivity {
 
         Intent intent = new Intent(context, BananaRoomActivity.class);
         context.startActivity(intent);
+    }
+
+    // Unity Ads Listeners
+    @Override
+    public void onInitializationComplete() {
+        appendLog("Unity Ads Initialization Complete.");
+        if (startUnityLoadAfterInit) {
+            startUnityLoadAfterInit = false;
+            loadNextUnityAd();
+        }
+    }
+
+    @Override
+    public void onInitializationFailed(UnityAds.UnityAdsInitializationError error, String message) {
+        appendLog("Unity Ads Initialization Failed: [" + error + "] " + message);
+    }
+
+    private BannerView.IListener bannerListener = new BannerView.IListener() {
+        @Override
+        public void onBannerLoaded(BannerView bannerAdView) {
+            appendLog("Unity banner loaded for placement: " + bannerAdView.getPlacementId());
+            berhasilt++;
+            saveInteger(BB, berhasilt, BananaRoomActivity.this);
+            data();
+
+            unityAdsLoadedCount++;
+            loadNextUnityAd();
+        }
+
+        @Override
+        public void onBannerFailedToLoad(BannerView bannerAdView, BannerErrorInfo errorInfo) {
+            appendLog("Unity Ads failed to load banner for " + bannerAdView.getPlacementId() + " with error: [" + errorInfo.errorCode + "] " + errorInfo.errorMessage);
+            gagalt++;
+            saveInteger(GG, gagalt, BananaRoomActivity.this);
+            data();
+        }
+
+        @Override
+        public void onBannerClick(BannerView bannerAdView) {
+            appendLog("Unity banner clicked: " + bannerAdView.getPlacementId());
+            cik++;
+            saveInteger(CIK, cik, BananaRoomActivity.this);
+            data();
+        }
+
+        @Override
+        public void onBannerLeftApplication(BannerView bannerAdView) {
+            appendLog("Unity banner left application: " + bannerAdView.getPlacementId());
+        }
+
+        @Override
+        public void onBannerShown(BannerView bannerView) {
+            appendLog("Unity banner shown");
+        }
+    };
+
+    private void loadNextUnityAd() {
+        if (unityAdsLoadedCount >= totalAdsToLoad) {
+            appendLog("All Unity ads loaded successfully.");
+            StartAutoReload();
+            return;
+        }
+
+        appendLog("Loading Unity ad " + (unityAdsLoadedCount + 1) + " of " + totalAdsToLoad);
+        String randomAdUnitId = getRandomUnityAdUnitId();
+        unityBannerView = new BannerView(this, randomAdUnitId, new UnityBannerSize(320, 50));
+        unityBannerView.setListener(bannerListener);
+
+        TextView title = new TextView(this);
+        title.setText("Unity AdView " + (unityAdsLoadedCount + 1));
+
+        LinearLayout layout = findViewById(R.id.banner_layout);
+        layout.addView(title);
+        layout.addView(unityBannerView);
+        unityBannerView.load();
     }
 }
