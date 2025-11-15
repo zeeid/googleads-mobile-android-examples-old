@@ -88,7 +88,7 @@ public class BananaRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     public final String RELOADE="reload";
     public boolean isTimerJalan=false, reload=false,autoclose,autoreload,IsIndo, IsAdmob=false;
-    public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor;
+    public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor,isMultiAdsNetwork,isFailOverMultiNetwork;
     public int maxsuccess = 1, maxfail = 1, isAutoLoad = 0;
 
     Button sett;
@@ -96,7 +96,7 @@ public class BananaRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     // Unity Ads fields
     private String unityGameID;
-    private Boolean testMode = true;
+    private Boolean testMode = false;
 //    private String unityBannerAdUnitId = "Banner_Android"; // Example Ad Unit ID from Unity docs
     private final String[] unityAdUnitIds = {
             "Banner_Android",
@@ -130,6 +130,21 @@ public class BananaRoomActivity extends AppCompatActivity implements IUnityAdsIn
         
     }
 
+    private void getMultiAdsNetwork() {
+        if (isMultiAdsNetwork) {
+            appendLog("Log : Random MultiAdsNetwork ");
+            boolean useAdmob = random.nextBoolean();
+            if (useAdmob) {
+                IsAdmob = true;
+            } else {
+                IsAdmob = false;
+            }
+        } else {
+            appendLog("Log : Default MultiAdsNetwork Admob");
+            IsAdmob = true;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,6 +166,8 @@ public class BananaRoomActivity extends AppCompatActivity implements IUnityAdsIn
         vpnprot         = (sharedPref.getInt("isVPNProtection", 0) == 1 );;
         indoprot        = (sharedPref.getInt("isIndoprot", 0) == 1 );
         keepgoing       = (sharedPref.getInt("isKeepgoing", 0) == 1 );
+        isMultiAdsNetwork       = (sharedPref.getInt("isMultiAdsNetwork", 0) == 1 );
+        isFailOverMultiNetwork  = (sharedPref.getInt("isFailOverMultiNetwork", 0) == 1 );
 
         autoreload       = (sharedPref.getInt("ReLoadBaner", 0) == 1 );
 
@@ -163,6 +180,8 @@ public class BananaRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
         banyak=sharedPref.getInt("jml_baner", 1);
         jumbanner.setText("Total ad per imprs :"+banyak);
+
+        getMultiAdsNetwork();
 
         if (keepgoing){
             if (gagalt > maxfail || berhasilt > maxsuccess) {
@@ -576,7 +595,7 @@ public class BananaRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 data();
 
                 adsLoadedCount++;
-                loadNextAd();
+                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> loadNextAd(), 5000);
             }
 
             @Override
@@ -723,7 +742,7 @@ public class BananaRoomActivity extends AppCompatActivity implements IUnityAdsIn
             data();
 
             unityAdsLoadedCount++;
-            loadNextUnityAd();
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> loadNextUnityAd(), 5000);
         }
 
         @Override
