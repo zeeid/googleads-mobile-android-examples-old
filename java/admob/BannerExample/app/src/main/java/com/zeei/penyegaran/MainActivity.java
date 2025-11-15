@@ -28,6 +28,8 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.unity3d.ads.IUnityAdsInitializationListener;
+import com.unity3d.ads.UnityAds;
 import com.zeei.penyegaran.data.FetchGeoIp;
 import com.zeei.penyegaran.login.AuthManager;
 
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ================ Metode untuk mengatur zona waktu sistem ==========
+    // ================ Metode untuk mengatur zona waktu sistem ==========/
     private static boolean setSystemTimeZone(Context context, String timeZoneId) {
         try {
             TimeZone.setDefault(TimeZone.getTimeZone(timeZoneId));
@@ -174,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    // ================= END TIME ZONE ====================================
+    // ================= END TIME ZONE ====================================/
 
     @Override
     public void onResume() {
@@ -204,6 +206,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         
+        String unityGameID = getString(R.string.unity_game_id);
+        boolean testMode = false;
+        UnityAds.initialize(getApplicationContext(), unityGameID, testMode, new IUnityAdsInitializationListener() {
+            @Override
+            public void onInitializationComplete() {
+                Log.d("UnityAds", "Initialization complete.");
+                Toast.makeText(MainActivity.this, "Initialization UnityAds complete.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onInitializationFailed(UnityAds.UnityAdsInitializationError error, String message) {
+                Log.e("UnityAds", "Initialization failed: [" + error + "] " + message);
+            }
+        });
+
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean(DARK_MODE_PREF, false);
         if (isDarkMode) {
