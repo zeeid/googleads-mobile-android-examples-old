@@ -71,20 +71,24 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <Button
-                android:id="@+id/set_reset"
+                android:id="@+id/load_admob_button"
                 style="@android:style/Widget.Holo.Button"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="resetOnClick"
-                android:text="Reset Estimate"
-                tools:ignore="RtlCompat" />
+                android:text="Load Admob" />
+
+            <Button
+                android:id="@+id/load_unity_button"
+                style="@android:style/Widget.Holo.Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Load Unity" />
         </LinearLayout>
 
         <RelativeLayout
