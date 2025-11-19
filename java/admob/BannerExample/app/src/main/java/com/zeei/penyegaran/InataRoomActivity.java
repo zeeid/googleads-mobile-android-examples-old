@@ -96,7 +96,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     private ScrollView logScrollView;
 
-    private String unityGameID = getString(R.string.unity_game_id);
+    private String unityGameID;
     private Boolean testMode = false;
     //private String adUnitId = "Interstitial_Android";
     private final String[] unityAdUnitIds = {
@@ -349,6 +349,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         viewBinds();
         CekDateUP();
         data();
+        
+        unityGameID = getString(R.string.unity_game_id);
 
         // Mengambil SharedPreferences
         SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
@@ -452,7 +454,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     public void loadAd() {
         requestot++;
-        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,InataRoomActivity.this);
+        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,this);
         dataC();
         appendLog("Log : Memuat iklan ADMOB interstitial");
         // Request a new ad if one isn't already loaded.
