@@ -218,11 +218,15 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         @Override
         public void onUnityAdsShowStart(String placementId) {
             Log.v("UnityAdsExample", "onUnityAdsShowStart: " + placementId);
-
+            Log.d("Unitylog","onUnityAdsShowStart: " + placementId);
             appendLog("Log : The Unity ad was shown.");
             show++;
             InterstialMe.saveInteger(InterstialMe.SHOW,show,InataRoomActivity.this);
             dataC();
+
+            if(autoclose) {
+                countDownTimeAR();
+            }
         }
 
         @Override
@@ -244,9 +248,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed,InataRoomActivity.this);
             dataC();
 
-            if(autoclose) {
-                countDownTimeAR();
-            }
+            Log.d("Unitylog","Unity Ad recorded an impression.");
+
         }
     };
 
