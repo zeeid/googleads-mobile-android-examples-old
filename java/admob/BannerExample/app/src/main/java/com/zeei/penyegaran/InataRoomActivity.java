@@ -45,6 +45,7 @@ import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.zeei.penyegaran.data.InterstialMe;
+import com.zeei.penyegaran.data.GeoIpChecker;
 
 import java.util.Date;
 import java.util.Locale;
@@ -153,7 +154,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
             if (AcakSponsor){
                 randomAdCode = layarPembukaAplikasiArray[randomIndex];
-            }else{
+            }
+            else{
                 if(layarPembukaAplikasiArray.length > 1){
                     randomAdCode = layarPembukaAplikasiArray[0];
                 }else{
@@ -334,7 +336,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         }
     }
 
-    private void loadAds() {
+    private void loadAdsInternal() {
         if (isMultiAdsNetwork) {
             appendLog("Log : Start MultiAdsNetwork ");
             boolean useAdmob = random.nextBoolean();
@@ -350,6 +352,47 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         } else {
             appendLog("Log : Start Single Admob ");
             loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
+        }
+    }
+
+    private void loadAds() {
+        if (indoprot) {
+            appendLog("Log : Checking IP for Indonesia protection...");
+            GeoIpChecker.checkIfIpIsIndonesia(this, new GeoIpChecker.OnIpCheckListener() {
+                @Override
+                public void onIpCheckResult(boolean isIndonesia) {
+                    InataRoomActivity.this.IsIndo = isIndonesia;
+                    if (isIndonesia) {
+                        appendLog("Log : IP is from Indonesia. Stopping timers and returning to MainActivity.");
+                        if (countDownTimer != null) {
+                            countDownTimer.cancel();
+                            countDownTimer = null;
+                        }
+                        if (countDownTimerAR != null) {
+                            countDownTimerAR.cancel();
+                            countDownTimerAR = null;
+                        }
+                        Intent intent = new Intent(InataRoomActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish(); // Close InataRoomActivity
+                    } else {
+                        appendLog("Log : Not in Indonesia (IP Protection active)");
+                        loadAdsInternal(); // Proceed to load ads if not in Indonesia
+                    }
+                }
+
+                @Override
+                public void onIpCheckError(String error) {
+                    Log.e(TAG, "IP Check Error: " + error);
+                    appendLog("Log : IP Check Error: " + error + ". Attempting to load ads anyway.");
+                    // If there's an error in IP checking, decide whether to proceed or block
+                    // For now, let's proceed to load ads to avoid blocking due to API issues.
+                    loadAdsInternal();
+                }
+            });
+        } else {
+            appendLog("Log : IP Protection is OFF. Proceeding to load ads.");
+            loadAdsInternal();
         }
     }
 
@@ -450,9 +493,6 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             // Pastikan SDK sudah siap dan ada izin sebelum memuat
             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
-            } else {
-                appendLog("Log : Admob start processing ");
-                loadAdmobAd();
             }
         });
 
@@ -899,7 +939,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         }
         if((sharedPref.getInt("ReLoadInata", 0) == 1 )) {
             close.setText("AUTO CLOSE ACTIVE ");
-        }else{
+        }
+        else{
             close.setText("AUTO CLOSE OFF");
         }
 
