@@ -196,7 +196,12 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 failovercount++;
                 if (failovercount < isFailOverMaxCount) {
                     appendLog("Log : Mencoba Load Network Lain ke "+failovercount);
-                    loadAdmobAd();
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadAdmobAd();
+                        }
+                    }, 5000);
                 } else {
                     appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
                     Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
@@ -224,9 +229,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             InterstialMe.saveInteger(InterstialMe.SHOW,show,InataRoomActivity.this);
             dataC();
 
-            if(autoclose) {
-                countDownTimeAR();
-            }
+
         }
 
         @Override
@@ -249,7 +252,10 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             dataC();
 
             Log.d("Unitylog","Unity Ad recorded an impression.");
-
+            if(autoclose) {
+                nutupsponsor();
+                //countDownTimeAR();
+            }
         }
     };
 
@@ -284,7 +290,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         UnityAds.load(randomAdUnitId, loadListener);
 
         requestot++;
-        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,InataRoomActivity.this);
+        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,this);
         dataC();
         appendLog("Log : Berhasil Memuat iklan interstitial Unity");
     }
@@ -333,9 +339,11 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             appendLog("Log : Start MultiAdsNetwork ");
             boolean useAdmob = random.nextBoolean();
             if (useAdmob) {
+                IsAdmob = true;
                 appendLog("Log : Start Admob ");
                 loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
             } else {
+                IsAdmob = false;
                 appendLog("Log : Start Unity ");
                 loadUnityAd(); // Panggil fungsi untuk memuat Unity
             }
@@ -478,8 +486,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         // an ad is loaded.
                         InataRoomActivity.this.interstitialAd = interstitialAd;
                         adIsLoading = false;
-                        Log.i(TAG, "onAdLoaded");
-                        Toast.makeText(InataRoomActivity.this, "onAdLoaded()", Toast.LENGTH_SHORT).show();
+                        Log.i(TAG, "ADMOB LOADED");
+                        Toast.makeText(InataRoomActivity.this, "ADMOB LOADED", Toast.LENGTH_SHORT).show();
                         berhasilt++;
                         InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity.this);
                         dataC();
@@ -530,7 +538,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                     public void onAdShowedFullScreenContent() {
                                         // Called when fullscreen content is shown.
                                         Log.d("TAG", "The ad was shown.");
-                                        appendLog("Log : The ad was shown.");
+                                        appendLog("Log : The ad ADMOB was shown.");
                                         show++;
                                         InterstialMe.saveInteger(InterstialMe.SHOW,show,InataRoomActivity.this);
                                         dataC();
@@ -551,7 +559,12 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                             failovercount++;
                             if (failovercount < isFailOverMaxCount) {
                                 appendLog("Log : Mencoba Load Network Lain ke "+failovercount);
-                                loadUnityAd();
+                                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        loadUnityAd();
+                                    }
+                                }, 5000);
                             } else {
                                 appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
                                 Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
@@ -604,7 +617,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 retryButton.setVisibility(View.VISIBLE);
 
                 if(autoclose && !mixbanerinter && countDownTimerAR == null) {
-                    retryButton.performClick();
+                    //retryButton.performClick();
                 }
 
             }
@@ -740,25 +753,89 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                             countDownTimerAR = null;
                         }
 
-                        Intent intent;
-                        if (mixbanerinter) {
-                            // Open BananaRoomActivity
-                            intent = new Intent(InataRoomActivity.this, BananaRoomActivity.class);
-                        } else {
-                            // Open InataRoomActivity again
-                            intent = new Intent(InataRoomActivity.this, InataRoomActivity.class);
-                        }
-
-                        startActivity(intent);
-
-                        // Close the current activity
-                        finish();
+                        nutupsponsor();
                     }
                 }
             }.start();
         }
     }
 
+    private void nutupsponsor(){
+        // --- IMPLEMENTASI TEKNIK MEDIUM ---
+        MyApplication application = (MyApplication) getApplicationContext();
+        final Activity foregroundActivity = application.getCurrentForegroundActivity();
+
+        // Cek apakah Activity yang sedang tampil adalah Activity iklan (AdMob atau sejenisnya)
+        if (foregroundActivity != null){
+
+            String className = foregroundActivity.getClass().getName();
+
+            if (className.contains("AdActivity")) { // 1. ADMOB
+                // Pilihan: Gunakan onBackPressed() jika Anda ingin memicu callback standar AdMob
+                // atau gunakan finish() jika Anda ingin penutupan paling paksa.
+                appendLog("Log : Timer selesai. Menutup AdMob Activity: " + className);
+
+                // Opsi Terbaik: Langsung finish() untuk keseragaman dan keandalan
+                foregroundActivity.onBackPressed();
+
+            } else if (className.contains("com.unity3d.ads")) { // 2. UNITY ADS
+                // Gunakan finish() karena onBackPressed() tidak bekerja pada Unity.
+                appendLog("Log : Timer selesai. Menutup Unity Ads Activity: " + className);
+                foregroundActivity.finish();
+            }
+//                            else{
+//                                appendLog("Log : Timer selesai. Menutup Unity Ads Activity: " + className);
+//                                foregroundActivity.finish();
+//                            }
+            Log.d("AD_CHECK", "Foreground Activity: " + className);
+
+
+            // 2. Tambahkan jeda (delay) dan kemudian transisi Intent
+            // Jeda diperlukan agar Activity Iklan punya waktu untuk menghilang
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Panggil fungsi transisi setelah jeda
+                    Log.d("AD_CHECK", "RUN next act ");
+                    goToNextActivity();
+                }
+            }, 11500); // Jeda 500ms
+
+        } else {
+            // Jika iklan sudah tertutup atau tidak ditemukan, langsung transisi
+            appendLog("Log : Timer selesai. Activity Iklan tidak ditemukan, langsung transisi.");
+            goToNextActivity();
+        }
+        // --- AKHIR IMPLEMENTASI TEKNIK MEDIUM ---
+    }
+
+    // Di dalam class InataRoomActivity
+    private void goToNextActivity() {
+        // Pastikan timer auto-close/reload dihentikan
+        if (countDownTimerAR != null) {
+            countDownTimerAR.cancel();
+            countDownTimerAR = null;
+        }
+        if (times != null) {
+            times.setText("Auto-Closing...");
+        }
+        showListener = null;
+        Intent intent;
+        if (mixbanerinter) {
+            intent = new Intent(InataRoomActivity.this, BananaRoomActivity.class);
+        } else {
+            intent = new Intent(InataRoomActivity.this, InataRoomActivity.class);
+        }
+
+
+        // Menggunakan FLAG_ACTIVITY_CLEAR_TASK sebagai fallback keamanan tambahan
+        // jika onBackedPressed() gagal menghancurkan AdActivity.
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+        startActivity(intent);
+        appendLog("Log : Transisi Intent baru dimulai.");
+        finishAffinity();
+    }
 
     public void viewBinds(){
         berhasil=findViewById(R.id.succsestotint);
