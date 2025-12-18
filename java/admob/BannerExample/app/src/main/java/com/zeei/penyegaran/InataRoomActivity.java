@@ -187,6 +187,13 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             berhasilt++;
             InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity.this);
             dataC();
+
+            Toast.makeText(InataRoomActivity.this, "Unity Ads loaded ad for " + placementId, Toast.LENGTH_SHORT).show();
+
+            if(autoclose) {
+                //nutupsponsor();
+                countDownTimeAR();
+            }
         }
 
         @Override
@@ -252,6 +259,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             impressed++;
             InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed,InataRoomActivity.this);
             dataC();
+
+            Toast.makeText(InataRoomActivity.this, "Unity Ad recorded an impression.", Toast.LENGTH_SHORT).show();
 
             Log.d("Unitylog","Unity Ad recorded an impression.");
             if(autoclose) {
@@ -821,6 +830,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             } else if (className.contains("com.unity3d.ads")) { // 2. UNITY ADS
                 // Gunakan finish() karena onBackPressed() tidak bekerja pada Unity.
                 appendLog("Log : Timer selesai. Menutup Unity Ads Activity: " + className);
+                foregroundActivity.onBackPressed();
                 foregroundActivity.finish();
             }
 //                            else{
@@ -838,6 +848,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                     // Panggil fungsi transisi setelah jeda
                     Log.d("AD_CHECK", "RUN next act ");
                     goToNextActivity();
+                    Toast.makeText(InataRoomActivity.this, "RUN next act ", Toast.LENGTH_SHORT).show();
                 }
             }, 11500); // Jeda 500ms
 
