@@ -208,7 +208,12 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                     new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            loadAdmobAd();
+                            if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                                loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
+                            }
+                            else{
+                                appendLog("Log : Admob Belum Consent");
+                            }
                         }
                     }, 5000);
                 } else {
@@ -226,7 +231,6 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
             appendLog("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
 
-//            loadAdmobAd();
         }
 
         @Override
@@ -352,7 +356,12 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             if (useAdmob) {
                 IsAdmob = true;
                 appendLog("Log : Start Admob ");
-                loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
+                if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                    loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
+                }
+                else{
+                    appendLog("Log : Admob Belum Consent");
+                }
             } else {
                 IsAdmob = false;
                 appendLog("Log : Start Unity ");
@@ -360,7 +369,12 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             }
         } else {
             appendLog("Log : Start Single Admob ");
-            loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
+            if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
+            }
+            else{
+                appendLog("Log : Admob Belum Consent");
+            }
         }
     }
 
@@ -867,6 +881,11 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             countDownTimerAR.cancel();
             countDownTimerAR = null;
         }
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
+
         if (times != null) {
             times.setText("Auto-Closing...");
         }
