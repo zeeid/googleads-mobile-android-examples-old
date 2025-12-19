@@ -954,8 +954,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         String timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
 
         // Menambahkan pesan baru ke TextView
-        logprogram.append(timeStamp + " - " + message + "
-");
+        logprogram.append(timeStamp + " - " + message + "\n");
 
         // Otomatis scroll ke paling bawah
         logScrollView.post(() -> logScrollView.fullScroll(View.FOCUS_DOWN));
@@ -982,8 +981,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
         reload=getBool(RELOADE,this);
 
-        tanggalan.setText("Estimates calculation in :
-"+InterstialMe.getString(InterstialMe.DATE,this));
+        tanggalan.setText("Estimates calculation in :\n"+InterstialMe.getString(InterstialMe.DATE,this));
         if((sharedPref.getInt("ReLoadInata", 0) == 1 )) {
             auto.setText("AUTO RELOAD ACTIVE");
         }else {
