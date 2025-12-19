@@ -212,7 +212,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
                             }
                             else{
-                                appendLog("Log : Admob Belum Consent");
+                                appendLog("Log : Admob Belum Consent #FailoverUnity");
                             }
                         }
                     }, 5000);
@@ -310,34 +310,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         appendLog("Log : Berhasil Memuat iklan interstitial Unity");
     }
 
-    private void loadAdmobAd(){
-        Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
-        appendLog("Google Mobile Ads SDK Version: " + MobileAds.getVersion());
+    // REMOVED loadAdmobAd() method. Its logic is integrated into onCreate.
 
-        googleMobileAdsConsentManager =
-                GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
-        googleMobileAdsConsentManager.gatherConsent(
-                this,
-                consentError -> {
-                    if (consentError != null) {
-                        Log.w(
-                                TAG,
-                                String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
-                    }
-
-                    startGame();
-
-                    if (googleMobileAdsConsentManager.canRequestAds()) {
-                        // Cukup panggil inisialisasi di sini.
-                        // Proses loadAd() akan otomatis dijalankan setelah inisialisasi selesai.
-                        loadAd();
-                    }
-
-                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
-                        invalidateOptionsMenu();
-                    }
-                });
-    }
     private void loadUnityAd(){
         if (!UnityAds.isInitialized()) {
             UnityAds.initialize(getApplicationContext(), unityGameID, testMode, InataRoomActivity.this);
@@ -360,7 +334,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                     loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
                 }
                 else{
-                    appendLog("Log : Admob Belum Consent");
+                    appendLog("Log : Admob Belum Consent #MultiAdsNetwork");
                 }
             } else {
                 IsAdmob = false;
@@ -373,7 +347,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
             }
             else{
-                appendLog("Log : Admob Belum Consent");
+                appendLog("Log : Admob Belum Consent #SingleAdsNetwork");
             }
         }
     }
@@ -470,16 +444,58 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             return;
         }
 
-        if(isAutoLoad == 1) {
-            loadAds();
-        }
+        // Initialize GoogleMobileAdsConsentManager here
+        googleMobileAdsConsentManager = GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
+
+        // Gather consent first. The ad loading logic will be inside the callback.
+        googleMobileAdsConsentManager.gatherConsent(
+                this,
+                consentError -> {
+                    if (consentError != null) {
+                        Log.w(TAG, String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
+                        appendLog("Log: Consent error: " + consentError.getMessage());
+                    }
+
+                    // Start the game (or whatever initial setup is needed) after consent is handled.
+                    startGame();
+
+                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
+                        invalidateOptionsMenu();
+                    }
+
+                    // Now that consent is determined, proceed to load ads if auto-load is enabled.
+                    if (isAutoLoad == 1) {
+                        loadAds();
+                    }
+                });
 
         retryButton = findViewById(R.id.retry_button);
         retryButton.setVisibility(View.INVISIBLE);
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadAds();
+                // When retry button is clicked, re-check consent and load ads if possible
+                if (googleMobileAdsConsentManager.canRequestAds()) {
+                    loadAds();
+                } else {
+                    
+                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
+                        // If privacy options are required, show the form.
+                        googleMobileAdsConsentManager.showPrivacyOptionsForm(InataRoomActivity.this, formError -> {
+                            if (formError != null) {
+                                Toast.makeText(InataRoomActivity.this, formError.getMessage(), Toast.LENGTH_SHORT).show();
+                            } else {
+                                // After showing form, retry loading ads if consent is now granted
+                                if (googleMobileAdsConsentManager.canRequestAds()) {
+                                    loadAds();
+                                }
+                            }
+                        });
+                    } else {
+                        appendLog("Log: Cannot request ads. Consent not granted or form required.");
+                        Toast.makeText(InataRoomActivity.this, "Cannot request ads. Consent not granted.", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
 
@@ -515,13 +531,18 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             appendLog("Tombol 'Load Admob' diklik. Memulai proses...");
             // Pastikan SDK sudah siap dan ada izin sebelum memuat
             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                IsAdmob = true; // Force AdMob for this button click
                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
+            } else {
+                appendLog("Log : Admob Belum Consent #LoadAdmobButton");
+                Toast.makeText(InataRoomActivity.this, "Admob Belum Consent", Toast.LENGTH_SHORT).show();
             }
         });
 
         loadUnityButton.setOnClickListener(v -> {
             appendLog("Tombol 'Load Unity' diklik. Memulai proses...");
             // Fungsi loadUnityAd sudah menangani inisialisasi jika diperlukan
+            IsAdmob = false; // Force Unity for this button click
             loadUnityAd();
         });
     }
@@ -933,7 +954,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         String timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
 
         // Menambahkan pesan baru ke TextView
-        logprogram.append(timeStamp + " - " + message + "\n");
+        logprogram.append(timeStamp + " - " + message + "
+");
 
         // Otomatis scroll ke paling bawah
         logScrollView.post(() -> logScrollView.fullScroll(View.FOCUS_DOWN));
@@ -960,7 +982,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
         reload=getBool(RELOADE,this);
 
-        tanggalan.setText("Estimates calculation in :\n"+InterstialMe.getString(InterstialMe.DATE,this));
+        tanggalan.setText("Estimates calculation in :
+"+InterstialMe.getString(InterstialMe.DATE,this));
         if((sharedPref.getInt("ReLoadInata", 0) == 1 )) {
             auto.setText("AUTO RELOAD ACTIVE");
         }else {
