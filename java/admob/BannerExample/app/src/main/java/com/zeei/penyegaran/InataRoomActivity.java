@@ -86,7 +86,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
 
     public final String RELOADE="reload";
-    public boolean reload=false,autoclose,autoreload,IsIndo, IsAdmob=true;
+    public boolean reload=false,autoclose,autoreload,IsIndo, IsAdmob=true, isTimerDone = false;
     public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor,isMultiAdsNetwork,isFailOverMultiNetwork;
     public int maxsuccess = 1, maxfail = 1, isAutoLoad = 0, isFailOverMaxCount = 4;
     public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60,failovercount=0;
@@ -191,7 +191,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             Toast.makeText(InataRoomActivity.this, "Unity Ads loaded ad for " + placementId, Toast.LENGTH_SHORT).show();
 
             if(autoclose) {
-                //nutupsponsor();
+                Log.d("AD_CHECK","autoclose from Unity Ads loaded ad for " + placementId);
+//                //nutupsponsor();
                 countDownTimeAR();
             }
         }
@@ -258,6 +259,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         @Override
         public void onUnityAdsShowComplete(String placementId, UnityAds.UnityAdsShowCompletionState state) {
             Log.v("UnityAdsExample", "onUnityAdsShowComplete: " + placementId);
+            Log.d("AD_CHECK","onUnityAdsShowComplete: " + placementId);
 
             appendLog("Log : Unity Ad recorded an impression.");
             impressed++;
@@ -267,7 +269,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             Toast.makeText(InataRoomActivity.this, "Unity Ad recorded an impression.", Toast.LENGTH_SHORT).show();
 
             Log.d("Unitylog","Unity Ad recorded an impression.");
-            if(autoclose) {
+            if(autoclose & !isTimerDone) {
                 nutupsponsor();
                 //countDownTimeAR();
             }
@@ -831,6 +833,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 }
 
                 public void onFinish() {
+                    isTimerDone = true;
                     if (autoclose) {
                         if (countDownTimerAR != null) {
                             countDownTimerAR.cancel();
@@ -853,7 +856,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         if (foregroundActivity != null){
 
             String className = foregroundActivity.getClass().getName();
-
+            Log.d("AD_CHECK", "Foreground Activity: " + className);
             if (className.contains("AdActivity")) { // 1. ADMOB
                 // Pilihan: Gunakan onBackPressed() jika Anda ingin memicu callback standar AdMob
                 // atau gunakan finish() jika Anda ingin penutupan paling paksa.
@@ -872,7 +875,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 //                                appendLog("Log : Timer selesai. Menutup Unity Ads Activity: " + className);
 //                                foregroundActivity.finish();
 //                            }
-            Log.d("AD_CHECK", "Foreground Activity: " + className);
+            Log.d("AD_CHECK", "Foreground Activity 2: " + className);
 
 
             // 2. Tambahkan jeda (delay) dan kemudian transisi Intent
@@ -880,12 +883,30 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    // Panggil fungsi transisi setelah jeda
-                    Log.d("AD_CHECK", "RUN next act ");
-                    goToNextActivity();
-                    Toast.makeText(InataRoomActivity.this, "RUN next act ", Toast.LENGTH_SHORT).show();
+                    // Re-check foreground activity before transitioning
+                    MyApplication currentApplication = (MyApplication) getApplicationContext();
+                    Activity currentForegroundActivity = currentApplication.getCurrentForegroundActivity();
+                    String currentClassName = currentForegroundActivity.getClass().getName();
+                    if (currentForegroundActivity != null) {
+
+                        if (currentClassName.contains("AdActivity") || currentClassName.contains("com.unity3d.ads")) {
+                            Toast.makeText(InataRoomActivity.this, "Ad activity still open, please close it first!", Toast.LENGTH_LONG).show();
+                            appendLog("Log: Ad activity (" + currentClassName + ") still open after delay, not transitioning yet.");
+                            Log.d("AD_CHECK", "currentForegroundActivity still open after delay, not transitioning yet.");
+                        } else {
+                            // Ad activity is no longer in foreground, proceed with transition
+                            Toast.makeText(InataRoomActivity.this, "RUN next act ", Toast.LENGTH_SHORT).show();
+                            Log.d("AD_CHECK", "currentForegroundActivity else RUN next act "+currentClassName);
+                            goToNextActivity();
+                        }
+                    } else {
+                        // No foreground activity, or it's not an ad activity, proceed with transition
+                        Toast.makeText(InataRoomActivity.this, "RUN next act ", Toast.LENGTH_SHORT).show();
+                        Log.d("AD_CHECK", "currentForegroundActivity null RUN next act "+currentClassName);
+                        goToNextActivity();
+                    }
                 }
-            }, 11500); // Jeda 500ms
+            }, 11500); // Jeda 11.5 seconds
 
         } else {
             // Jika iklan sudah tertutup atau tidak ditemukan, langsung transisi
