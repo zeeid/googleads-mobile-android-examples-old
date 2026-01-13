@@ -202,6 +202,11 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             Log.e("UnityAdsExample", "Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
             appendLog("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
             categori.setText("Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+
+            gagalt++;
+            InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity.this);
+            dataC();
+            
             if (isFailOverMultiNetwork) {
                 failovercount++;
                 if (failovercount < isFailOverMaxCount) {
@@ -641,6 +646,10 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        gagalt++;
+                        InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity.this);
+                        dataC();
+
                         if (isFailOverMultiNetwork) {
                             failovercount++;
                             if (failovercount < isFailOverMaxCount) {
