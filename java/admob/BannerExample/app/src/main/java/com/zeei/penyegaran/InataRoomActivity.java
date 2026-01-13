@@ -227,6 +227,11 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                     Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
                 }
             }
+            else{
+                if (keepgoing){
+                    createTimer(0,true);
+                }
+            }
         }
     };
 
@@ -665,6 +670,11 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                 Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
                             }
                         }
+                        else{
+                            if (keepgoing){
+                                createTimer(0,true);
+                            }
+                        }
 
                         // Handle the error
                         Log.i(TAG, loadAdError.getMessage());
@@ -691,12 +701,21 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 });
     }
 
-    private void createTimer(final long milliseconds) {
+    private void createTimer(long milliseconds, boolean klikretry ) {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
 
         final TextView textView = findViewById(R.id.timer);
+
+        if (milliseconds < 1) {
+            int min = 1;   // detik
+            int max = 15;  // detik
+
+            int randomDetik = min + new Random().nextInt(max - min + 1);
+            milliseconds = randomDetik * 1000;
+            appendLog("Log: Timer akan dimulai dalam "+randomDetik+" detik.");
+        }
 
         countDownTimer = new CountDownTimer(milliseconds, 50) {
             @Override
@@ -713,6 +732,11 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                 if(autoclose && !mixbanerinter && countDownTimerAR == null) {
                     //retryButton.performClick();
+                }
+
+                if(klikretry){
+                    retryButton.performClick();
+                    appendLog("Log: Retry button clicked.");
                 }
 
             }
@@ -805,7 +829,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     private void startGame() {
         // Hide the button, and kick off the timer.
         retryButton.setVisibility(View.INVISIBLE);
-        createTimer(GAME_LENGTH_MILLISECONDS);
+        createTimer(GAME_LENGTH_MILLISECONDS, false);
         gamePaused = false;
         gameOver = false;
     }
@@ -816,7 +840,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         }
         // Create a new timer for the correct length.
         gamePaused = false;
-        createTimer(timerMilliseconds);
+        createTimer(timerMilliseconds, false);
     }
 
     private void pauseGame() {
