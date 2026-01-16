@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.app.Activity;
 import android.widget.ScrollView;
+import android.os.Handler; // Import Handler
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -502,7 +503,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         googleMobileAdsConsentManager.showPrivacyOptionsForm(InataRoomActivity.this, formError -> {
                             if (formError != null) {
                                 Toast.makeText(InataRoomActivity.this, formError.getMessage(), Toast.LENGTH_SHORT).show();
-                            } else {
+                            }
+                            else {
                                 // After showing form, retry loading ads if consent is now granted
                                 if (googleMobileAdsConsentManager.canRequestAds()) {
                                     loadAds();
@@ -651,8 +653,21 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                     }
                                 });
 
-                        // Langsung tampilkan iklan karena sudah berhasil di-load.
-                        interstitialAd.show(InataRoomActivity.this);
+                        // Add a delay before showing the ad.
+                        int minDelay = 10000; // 10 seconds
+                        int maxDelay = 15000; // 15 seconds
+                        int randomDelay = new Random().nextInt(maxDelay - minDelay + 1) + minDelay;
+
+                        appendLog("Log : AdMob interstitial loaded. Showing in " + (randomDelay / 1000) + " seconds.");
+
+                        new Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (InataRoomActivity.this.interstitialAd != null) {
+                                    InataRoomActivity.this.interstitialAd.show(InataRoomActivity.this);
+                                }
+                            }
+                        }, randomDelay);
                     }
 
                     @Override
