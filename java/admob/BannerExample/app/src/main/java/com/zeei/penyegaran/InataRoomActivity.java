@@ -206,9 +206,9 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             gagalt++;
             InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity.this);
             dataC();
-            
+            failovercount++;
             if (isFailOverMultiNetwork) {
-                failovercount++;
+
                 if (failovercount < isFailOverMaxCount) {
                     appendLog("Log : Mencoba Load Network Lain ke "+failovercount);
                     new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
@@ -229,7 +229,13 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             }
             else{
                 if (keepgoing){
-                    createTimer(0,true);
+                    if (failovercount < isFailOverMaxCount) {
+                        appendLog("Log : Mencoba Load Lagi "+failovercount);
+                        createTimer(0,true);
+                    } else {
+                        appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                        Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         }
@@ -654,9 +660,9 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         gagalt++;
                         InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity.this);
                         dataC();
-
+                        failovercount++;
                         if (isFailOverMultiNetwork) {
-                            failovercount++;
+
                             if (failovercount < isFailOverMaxCount) {
                                 appendLog("Log : Mencoba Load Network Lain ke "+failovercount);
                                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
@@ -672,7 +678,14 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         }
                         else{
                             if (keepgoing){
-                                createTimer(0,true);
+                                if (failovercount < isFailOverMaxCount) {
+                                    appendLog("Log : Mencoba Load Lagi "+failovercount);
+                                    createTimer(0,true);
+                                } else {
+                                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                                    Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
+                                }
+
                             }
                         }
 
@@ -709,7 +722,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         final TextView textView = findViewById(R.id.timer);
 
         if (milliseconds < 1) {
-            int min = 1;   // detik
+            int min = 10;   // detik
             int max = 15;  // detik
 
             int randomDetik = min + new Random().nextInt(max - min + 1);
