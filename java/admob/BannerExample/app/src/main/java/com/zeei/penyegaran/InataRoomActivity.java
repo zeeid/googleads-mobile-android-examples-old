@@ -997,7 +997,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         if (mixbanerinter) {
             intent = new Intent(InataRoomActivity.this, BananaRoomActivity.class);
         } else {
-            intent = new Intent(InataRoomActivity.this, InataRoomActivity.class);
+            intent = new Intent(InataRoomActivity.this, InataRoomActivity_level1.class);
         }
 
 

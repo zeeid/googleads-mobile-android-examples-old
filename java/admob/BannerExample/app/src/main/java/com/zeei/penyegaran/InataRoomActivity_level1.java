@@ -31,6 +31,8 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.Activity;
+import android.widget.ScrollView;
+import android.os.Handler; // Import Handler
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,7 +46,10 @@ import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.zeei.penyegaran.data.InterstialMe;
+import com.zeei.penyegaran.data.GeoIpChecker;
 
+import java.util.Date;
+import java.util.Locale;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -68,7 +73,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
     public static final String TEST_DEVICE_HASHED_ID = "ABCDEF012345";
 
     private static final long GAME_LENGTH_MILLISECONDS = 9000;
-    private static final String TAG = "InataRoomActivity_level1";
+    private static final String TAG = "InataRoomActivity";
 
     private final AtomicBoolean isMobileAdsInitializeCalled = new AtomicBoolean(false);
     private GoogleMobileAdsConsentManager googleMobileAdsConsentManager;
@@ -82,17 +87,27 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
 
 
     public final String RELOADE="reload";
-    public boolean reload=false,autoclose,autoreload,IsIndo, IsAdmob=true;
-    public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor;
-    public int maxsuccess = 1, maxfail = 1;
-    public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60;
+    public boolean reload=false,autoclose,autoreload,IsIndo, IsAdmob=true, isTimerDone = false;
+    public boolean rotation,vpnprot,indoprot,keepgoing,mixbanerinter,usetestunit,AcakSponsor,isMultiAdsNetwork,isFailOverMultiNetwork;
+    public int maxsuccess = 1, maxfail = 1, isAutoLoad = 0, isFailOverMaxCount = 4;
+    public int gagalt=0,berhasilt=0,cik=0,show=0,impressed = 0,requestot=0,TimerInata=60,failovercount=0;
     public String ratess,AdsUnitID;
     Button sett;
+    Button clearLogButton, loadAdmobButton, loadUnityButton;
     TextView jmlrequest,berhasil,gagal,auto,categori,close,tanggalan,adopen,rate,showon,times,impreson,logprogram;
 
-    private String unityGameID = "5855626";
+    private ScrollView logScrollView;
+
+    private String unityGameID;
     private Boolean testMode = false;
-    private String adUnitId = "Interstitial_Android";
+    //private String adUnitId = "Interstitial_Android";
+    private final String[] unityAdUnitIds = {
+            "Interstitial_Android", // GANTI DENGAN ID PERTAMA ANDA
+            "Interstitial_Android_Bidding", // GANTI DENGAN ID KEDUA ANDA
+            "Gabungan_intertial_ads",
+            "PL_air_terjun",
+            "geo_collection"  // GANTI DENGAN ID KETIGA ANDA
+    };
 
     Random random = new Random();
     boolean useAdmob = random.nextBoolean();
@@ -140,7 +155,8 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
 
             if (AcakSponsor){
                 randomAdCode = layarPembukaAplikasiArray[randomIndex];
-            }else{
+            }
+            else{
                 if(layarPembukaAplikasiArray.length > 1){
                     randomAdCode = layarPembukaAplikasiArray[0];
                 }else{
@@ -155,20 +171,74 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         return randomAdCode;
     }
 
+    private String getRandomUnityAdUnitId() {
+        // Memilih indeks acak dari 0 sampai (panjang array - 1)
+        int randomIndex = random.nextInt(unityAdUnitIds.length);
+        String selectedAdUnitId = unityAdUnitIds[randomIndex];
+        Log.d(TAG, "Menggunakan Unity Ad Unit ID: " + selectedAdUnitId);
+        appendLog("Log: Memilih Unity Ad Unit ID: " + selectedAdUnitId);
+        return selectedAdUnitId;
+    }
 
     private IUnityAdsLoadListener loadListener = new IUnityAdsLoadListener() {
         @Override
         public void onUnityAdsAdLoaded(String placementId) {
-            UnityAds.show(InataRoomActivity_level1.this, adUnitId, new UnityAdsShowOptions(), showListener);
+            failovercount = 0;
+            UnityAds.show(InataRoomActivity_level1.this, placementId, new UnityAdsShowOptions(), showListener);
+            berhasilt++;
+            InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity_level1.this);
+            dataC();
+
+            Toast.makeText(InataRoomActivity_level1.this, "Unity Ads loaded ad for " + placementId, Toast.LENGTH_SHORT).show();
+
+            if(autoclose) {
+                Log.d("AD_CHECK","autoclose from Unity Ads loaded ad for " + placementId);
+//                //nutupsponsor();
+                countDownTimeAR();
+            }
         }
 
         @Override
         public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
             Log.e("UnityAdsExample", "Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+            appendLog("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+            categori.setText("Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
 
-            logprogram.setText("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+            gagalt++;
+            InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity_level1.this);
+            dataC();
+            failovercount++;
+            if (isFailOverMultiNetwork) {
 
-            loadAdmobAd();
+                if (failovercount < isFailOverMaxCount) {
+                    appendLog("Log : Mencoba Load Network Lain ke "+failovercount);
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                                loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
+                            }
+                            else{
+                                appendLog("Log : Admob Belum Consent #FailoverUnity");
+                            }
+                        }
+                    }, 5000);
+                } else {
+                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                    Toast.makeText(InataRoomActivity_level1.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else{
+                if (keepgoing){
+                    if (failovercount < isFailOverMaxCount) {
+                        appendLog("Log : Mencoba Load Lagi "+failovercount);
+                        createTimer(0,true);
+                    } else {
+                        appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                        Toast.makeText(InataRoomActivity_level1.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
         }
     };
 
@@ -177,26 +247,27 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         public void onUnityAdsShowFailure(String placementId, UnityAds.UnityAdsShowError error, String message) {
             Log.e("UnityAdsExample", "Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
 
-            logprogram.setText("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
+            appendLog("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
 
-            loadAdmobAd();
         }
 
         @Override
         public void onUnityAdsShowStart(String placementId) {
             Log.v("UnityAdsExample", "onUnityAdsShowStart: " + placementId);
-
-            logprogram.setText("Log : The Unity ad was shown.");
+            Log.d("Unitylog","onUnityAdsShowStart: " + placementId);
+            appendLog("Log : The Unity ad was shown.");
             show++;
             InterstialMe.saveInteger(InterstialMe.SHOW,show,InataRoomActivity_level1.this);
             dataC();
+
+
         }
 
         @Override
         public void onUnityAdsShowClick(String placementId) {
             Log.v("UnityAdsExample", "onUnityAdsShowClick: " + placementId);
 
-            logprogram.setText("Log : Unity Ad was clicked.");
+            appendLog("Log : Unity Ad was clicked.");
             cik++;
             InterstialMe.saveInteger(InterstialMe.OPEN,cik,InataRoomActivity_level1.this);
             dataC();
@@ -205,14 +276,19 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         @Override
         public void onUnityAdsShowComplete(String placementId, UnityAds.UnityAdsShowCompletionState state) {
             Log.v("UnityAdsExample", "onUnityAdsShowComplete: " + placementId);
+            Log.d("AD_CHECK","onUnityAdsShowComplete: " + placementId);
 
-            logprogram.setText("Log : Unity Ad recorded an impression.");
+            appendLog("Log : Unity Ad recorded an impression.");
             impressed++;
             InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed,InataRoomActivity_level1.this);
             dataC();
 
-            if(autoclose) {
-                countDownTimeAR();
+            Toast.makeText(InataRoomActivity_level1.this, "Unity Ad recorded an impression.", Toast.LENGTH_SHORT).show();
+
+            Log.d("Unitylog","Unity Ad recorded an impression.");
+            if(autoclose & !isTimerDone) {
+                nutupsponsor();
+                //countDownTimeAR();
             }
         }
     };
@@ -236,73 +312,103 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
             }
         }else{
             countDownTimer.cancel();
-            logprogram.setText("Log: Unity Ads initialization failed with error: [" + error + "] " + message);
+            appendLog("Log: Unity Ads initialization failed with error: [" + error + "] " + message);
             Toast.makeText(InataRoomActivity_level1.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
         }
     }
 
     // Implement a function to load an interstitial ad. The ad will start to show after the ad has been loaded.
     public void DisplayInterstitialAd () {
-        UnityAds.load(adUnitId, loadListener);
 
-        berhasilt++;
-        InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity_level1.this);
+        String randomAdUnitId = getRandomUnityAdUnitId();
+        UnityAds.load(randomAdUnitId, loadListener);
+
+        requestot++;
+        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,this);
         dataC();
-        logprogram.setText("Log : Berhasil Memuat iklan interstitial Unity");
+        appendLog("Log : Berhasil Memuat iklan interstitial Unity");
     }
 
-    private void loadAdmobAd(){
-        Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
+    // REMOVED loadAdmobAd() method. Its logic is integrated into onCreate.
 
-        googleMobileAdsConsentManager =
-                GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
-        googleMobileAdsConsentManager.gatherConsent(
-                this,
-                consentError -> {
-                    if (consentError != null) {
-                        // Consent not obtained in current session.
-                        Log.w(
-                                TAG,
-                                String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
-                    }
-
-                    startGame();
-
-                    if (googleMobileAdsConsentManager.canRequestAds()) {
-                        initializeMobileAdsSdk();
-                    }
-
-                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
-                        // Regenerate the options menu to include a privacy setting.
-                        invalidateOptionsMenu();
-                    }
-                });
-
-        // This sample attempts to load ads using consent obtained in the previous session.
-        if (googleMobileAdsConsentManager.canRequestAds()) {
-            initializeMobileAdsSdk();
-        }
-
-
-        Log.d(TAG, "Google interstitialAd: " + interstitialAd);
-        Log.d(TAG, "Google canRequestAds: " + googleMobileAdsConsentManager.canRequestAds());
-        if (interstitialAd != null) {
-            interstitialAd.show(this);
-        }else {
-            //startGame();
-            if (googleMobileAdsConsentManager.canRequestAds()) {
-                loadAd();
-            }
-        }
-    }
     private void loadUnityAd(){
         if (!UnityAds.isInitialized()) {
             UnityAds.initialize(getApplicationContext(), unityGameID, testMode, InataRoomActivity_level1.this);
-            logprogram.setText("Log : UnityAds initialize... ");
+            appendLog("Log : UnityAds initialize... ");
         } else {
-            logprogram.setText("Log : UnityAds READY to Show... ");
+            appendLog("Log : UnityAds READY to Show... ");
             // Jika sudah terinisialisasi, Anda bisa langsung coba muat iklannya
             DisplayInterstitialAd();
+        }
+    }
+
+    private void loadAdsInternal() {
+        if (isMultiAdsNetwork) {
+            appendLog("Log : Start MultiAdsNetwork ");
+            boolean useAdmob = random.nextBoolean();
+            if (useAdmob) {
+                IsAdmob = true;
+                appendLog("Log : Start Admob ");
+                if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                    loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
+                }
+                else{
+                    appendLog("Log : Admob Belum Consent #MultiAdsNetwork");
+                }
+            } else {
+                IsAdmob = false;
+                appendLog("Log : Start Unity ");
+                loadUnityAd(); // Panggil fungsi untuk memuat Unity
+            }
+        } else {
+            appendLog("Log : Start Single Admob ");
+            if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
+            }
+            else{
+                appendLog("Log : Admob Belum Consent #SingleAdsNetwork");
+            }
+        }
+    }
+
+    private void loadAds() {
+        if (indoprot) {
+            appendLog("Log : Checking IP for Indonesia protection...");
+            GeoIpChecker.checkIfIpIsIndonesia(this, new GeoIpChecker.OnIpCheckListener() {
+                @Override
+                public void onIpCheckResult(boolean isIndonesia) {
+                    InataRoomActivity_level1.this.IsIndo = isIndonesia;
+                    if (isIndonesia) {
+                        appendLog("Log : IP is from Indonesia. Stopping timers and returning to MainActivity.");
+                        if (countDownTimer != null) {
+                            countDownTimer.cancel();
+                            countDownTimer = null;
+                        }
+                        if (countDownTimerAR != null) {
+                            countDownTimerAR.cancel();
+                            countDownTimerAR = null;
+                        }
+                        Intent intent = new Intent(InataRoomActivity_level1.this, MainActivity.class);
+                        startActivity(intent);
+                        finish(); // Close InataRoomActivity_level1
+                    } else {
+                        appendLog("Log : Not in Indonesia (IP Protection active)");
+                        loadAdsInternal(); // Proceed to load ads if not in Indonesia
+                    }
+                }
+
+                @Override
+                public void onIpCheckError(String error) {
+                    Log.e(TAG, "IP Check Error: " + error);
+                    appendLog("Log : IP Check Error: " + error + ". Attempting to load ads anyway.");
+                    // If there's an error in IP checking, decide whether to proceed or block
+                    // For now, let's proceed to load ads to avoid blocking due to API issues.
+                    loadAdsInternal();
+                }
+            });
+        } else {
+            appendLog("Log : IP Protection is OFF. Proceeding to load ads.");
+            loadAdsInternal();
         }
     }
 
@@ -314,6 +420,8 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         CekDateUP();
         data();
 
+        unityGameID = getString(R.string.unity_game_id);
+
         // Mengambil SharedPreferences
         SharedPreferences sharedPref = getSharedPreferences("DataLogin", Context.MODE_PRIVATE);
 
@@ -323,10 +431,14 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         vpnprot         = (sharedPref.getInt("isVPNProtection", 0) == 1 );;
         indoprot        = (sharedPref.getInt("isIndoprot", 0) == 1 );
         keepgoing       = (sharedPref.getInt("isKeepgoing", 0) == 1 );
+        isMultiAdsNetwork       = (sharedPref.getInt("isMultiAdsNetwork", 0) == 1 );
+        isFailOverMultiNetwork  = (sharedPref.getInt("isFailOverMultiNetwork", 0) == 1 );
 
+        isFailOverMaxCount  = sharedPref.getInt("isFailOverMaxCount", 4);
         maxsuccess  = sharedPref.getInt("maxsuccess", 0);
         maxfail     = sharedPref.getInt("maxfail", 0);
-
+        isAutoLoad  = sharedPref.getInt("isAutoLoad", 0);
+        Log.d("SettingsLog", "isAutoLoad: " + isAutoLoad);
         Log.d("SettingsLog", "maxsuccess: " + maxsuccess);
         Log.d("SettingsLog", "maxfail: " + maxfail);
         Log.d("SettingsLog", "berhasilt: " + berhasilt);
@@ -351,28 +463,65 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
             return;
         }
 
-        if (useAdmob) {
-            logprogram.setText("Log : Admob start processing ");
-            loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
-        } else {
-            logprogram.setText("Log : UnityAds start processing ");
-            loadUnityAd(); // Panggil fungsi untuk memuat Unity
-        }
+        // Initialize GoogleMobileAdsConsentManager here
+        googleMobileAdsConsentManager = GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
+
+        // Gather consent first. The ad loading logic will be inside the callback.
+        googleMobileAdsConsentManager.gatherConsent(
+                this,
+                consentError -> {
+                    if (consentError != null) {
+                        Log.w(TAG, String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
+                        appendLog("Log: Consent error: " + consentError.getMessage());
+                    }
+
+                    // Start the game (or whatever initial setup is needed) after consent is handled.
+                    startGame();
+
+                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
+                        invalidateOptionsMenu();
+                    }
+
+                    // Now that consent is determined, proceed to load ads if auto-load is enabled.
+                    if (isAutoLoad == 1) {
+                        loadAds();
+                    }
+                });
 
         retryButton = findViewById(R.id.retry_button);
         retryButton.setVisibility(View.INVISIBLE);
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean useAdmob = random.nextBoolean();
-                if (useAdmob) {
-                    logprogram.setText("Log : Admob start processing ");
-                    loadAdmobAd(); // Panggil fungsi untuk memuat AdMob
+                // When retry button is clicked, re-check consent and load ads if possible
+                if (googleMobileAdsConsentManager.canRequestAds()) {
+                    loadAds();
                 } else {
-                    logprogram.setText("Log : UnityAds start processing ");
-                    loadUnityAd(); // Panggil fungsi untuk memuat Unity
+
+                    if (googleMobileAdsConsentManager.isPrivacyOptionsRequired()) {
+                        // If privacy options are required, show the form.
+                        googleMobileAdsConsentManager.showPrivacyOptionsForm(InataRoomActivity_level1.this, formError -> {
+                            if (formError != null) {
+                                Toast.makeText(InataRoomActivity_level1.this, formError.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                // After showing form, retry loading ads if consent is now granted
+                                if (googleMobileAdsConsentManager.canRequestAds()) {
+                                    loadAds();
+                                }
+                            }
+                        });
+                    } else {
+                        appendLog("Log: Cannot request ads. Consent not granted or form required.");
+                        Toast.makeText(InataRoomActivity_level1.this, "Cannot request ads. Consent not granted.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
+        });
+
+        clearLogButton.setOnClickListener(v -> {
+            logprogram.setText(""); // Mengosongkan textview log
+            appendLog("Log telah dibersihkan."); // Memberi pesan konfirmasi di log baru
         });
 
         Button buttonreset = findViewById(R.id.reset);
@@ -397,13 +546,32 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                         });
             }
         });
+
+        loadAdmobButton.setOnClickListener(v -> {
+            appendLog("Tombol 'Load Admob' diklik. Memulai proses...");
+            // Pastikan SDK sudah siap dan ada izin sebelum memuat
+            if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                IsAdmob = true; // Force AdMob for this button click
+                loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
+            } else {
+                appendLog("Log : Admob Belum Consent #LoadAdmobButton");
+                Toast.makeText(InataRoomActivity_level1.this, "Admob Belum Consent", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        loadUnityButton.setOnClickListener(v -> {
+            appendLog("Tombol 'Load Unity' diklik. Memulai proses...");
+            // Fungsi loadUnityAd sudah menangani inisialisasi jika diperlukan
+            IsAdmob = false; // Force Unity for this button click
+            loadUnityAd();
+        });
     }
 
     public void loadAd() {
         requestot++;
-        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,InataRoomActivity_level1.this);
+        InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,this);
         dataC();
-        logprogram.setText("Log : Memuat iklan interstitial");
+        appendLog("Log : Memuat iklan ADMOB interstitial");
         // Request a new ad if one isn't already loaded.
         if (adIsLoading || interstitialAd != null) {
             return;
@@ -417,22 +585,23 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        failovercount = 0;
                         // The mInterstitialAd reference will be null until
                         // an ad is loaded.
                         InataRoomActivity_level1.this.interstitialAd = interstitialAd;
                         adIsLoading = false;
-                        Log.i(TAG, "onAdLoaded");
-                        Toast.makeText(InataRoomActivity_level1.this, "onAdLoaded()", Toast.LENGTH_SHORT).show();
+                        Log.i(TAG, "ADMOB LOADED");
+                        Toast.makeText(InataRoomActivity_level1.this, "ADMOB LOADED", Toast.LENGTH_SHORT).show();
                         berhasilt++;
                         InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity_level1.this);
                         dataC();
-                        logprogram.setText("Log : Berhasil Memuat iklan interstitial");
+                        appendLog("Log : Berhasil Memuat iklan interstitial");
                         interstitialAd.setFullScreenContentCallback(
                                 new FullScreenContentCallback() {
                                     @Override
                                     public void onAdClicked() {
                                         // Called when a click is recorded for an ad.
-                                        logprogram.setText("Log : Ad was clicked.");
+                                        appendLog("Log : Ad was clicked.");
                                         cik++;
                                         InterstialMe.saveInteger(InterstialMe.OPEN,cik,InataRoomActivity_level1.this);
                                         dataC();
@@ -444,7 +613,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                                         // Make sure to set your reference to null so you don't
                                         // show it a second time.
                                         InataRoomActivity_level1.this.interstitialAd = null;
-                                        logprogram.setText("Log : The ad was dismissed.");
+                                        appendLog("Log : The ad was dismissed.");
                                         Log.d("TAG", "The ad was dismissed.");
                                     }
 
@@ -454,41 +623,86 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                                         // Make sure to set your reference to null so you don't
                                         // show it a second time.
                                         InataRoomActivity_level1.this.interstitialAd = null;
-                                        logprogram.setText("Log : The ad failed to show.");
+                                        appendLog("Log : The ad failed to show.");
                                         Log.d("TAG", "The ad failed to show.");
                                     }
 
                                     @Override
                                     public void onAdImpression() {
                                         // Called when an impression is recorded for an ad.
-                                        logprogram.setText("Log : Ad recorded an impression.");
+                                        appendLog("Log : Ad recorded an impression.");
                                         impressed++;
                                         InterstialMe.saveInteger(InterstialMe.IMPRESSED,impressed,InataRoomActivity_level1.this);
                                         dataC();
 
-                                        if(autoclose) {
-                                            countDownTimeAR();
-                                        }
+
                                     }
 
                                     @Override
                                     public void onAdShowedFullScreenContent() {
                                         // Called when fullscreen content is shown.
                                         Log.d("TAG", "The ad was shown.");
-                                        logprogram.setText("Log : The ad was shown.");
+                                        appendLog("Log : The ad ADMOB was shown.");
                                         show++;
                                         InterstialMe.saveInteger(InterstialMe.SHOW,show,InataRoomActivity_level1.this);
                                         dataC();
+
+                                        if(autoclose) {
+                                            countDownTimeAR();
+                                        }
                                     }
                                 });
 
-                        // Langsung tampilkan iklan karena sudah berhasil di-load.
-                        interstitialAd.show(InataRoomActivity_level1.this);
+                        // Add a delay before showing the ad.
+                        int minDelay = 10000; // 10 seconds
+                        int maxDelay = 15000; // 15 seconds
+                        int randomDelay = new Random().nextInt(maxDelay - minDelay + 1) + minDelay;
+
+                        appendLog("Log : AdMob interstitial loaded. Showing in " + (randomDelay / 1000) + " seconds.");
+
+                        new Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (InataRoomActivity_level1.this.interstitialAd != null) {
+                                    InataRoomActivity_level1.this.interstitialAd.show(InataRoomActivity_level1.this);
+                                }
+                            }
+                        }, randomDelay);
                     }
 
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        loadUnityAd();
+                        gagalt++;
+                        InterstialMe.saveInteger(InterstialMe.GAGAL,gagalt,InataRoomActivity_level1.this);
+                        dataC();
+                        failovercount++;
+                        if (isFailOverMultiNetwork) {
+
+                            if (failovercount < isFailOverMaxCount) {
+                                appendLog("Log : Mencoba Load Network Lain ke "+failovercount);
+                                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        loadUnityAd();
+                                    }
+                                }, 5000);
+                            } else {
+                                appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                                Toast.makeText(InataRoomActivity_level1.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else{
+                            if (keepgoing){
+                                if (failovercount < isFailOverMaxCount) {
+                                    appendLog("Log : Mencoba Load Lagi "+failovercount);
+                                    createTimer(0,true);
+                                } else {
+                                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                                    Toast.makeText(InataRoomActivity_level1.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        }
 
                         // Handle the error
                         Log.i(TAG, loadAdError.getMessage());
@@ -506,20 +720,30 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                                         InataRoomActivity_level1.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT)
                                 .show();
 
-                        logprogram.setText("Log : Error ADMOB "+error);
+                        appendLog("Log : Error ADMOB "+error);
 
-                        logprogram.setText("Log : UnityAds initialize ");
+                        categori.setText("Log : Error ADMOB "+error);
+
 
                     }
                 });
     }
 
-    private void createTimer(final long milliseconds) {
+    private void createTimer(long milliseconds, boolean klikretry ) {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
 
         final TextView textView = findViewById(R.id.timer);
+
+        if (milliseconds < 1) {
+            int min = 10;   // detik
+            int max = 15;  // detik
+
+            int randomDetik = min + new Random().nextInt(max - min + 1);
+            milliseconds = randomDetik * 1000;
+            appendLog("Log: Timer akan dimulai dalam "+randomDetik+" detik.");
+        }
 
         countDownTimer = new CountDownTimer(milliseconds, 50) {
             @Override
@@ -534,8 +758,13 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                 textView.setText("done!");
                 retryButton.setVisibility(View.VISIBLE);
 
-                if(autoclose) {
+                if(autoclose && !mixbanerinter && countDownTimerAR == null) {
+                    //retryButton.performClick();
+                }
+
+                if(klikretry){
                     retryButton.performClick();
+                    appendLog("Log: Retry button clicked.");
                 }
 
             }
@@ -554,6 +783,25 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
     public void onPause() {
         super.onPause();
         pauseGame();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        if (countDownTimerAR != null) {
+            countDownTimerAR.cancel();
+        }
+
+        // Hancurkan referensi AdMob Interstitial Ad
+        interstitialAd = null;
+
+        // Untuk Unity Ads, tidak ada metode destroy() per iklan interstisial.
+        // SDK Unity Ads menangani siklus hidupnya sendiri dan listener akan
+        // otomatis dibersihkan saat Activity dihancurkan.
+
+        super.onDestroy();
     }
 
     @Override
@@ -604,22 +852,12 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         return super.onOptionsItemSelected(item);
     }
 
-    private void showInterstitial() {
-        // Show the ad if it's ready. Otherwise restart the game.
-        if (interstitialAd != null) {
-            interstitialAd.show(this);
-        } else {
-            startGame();
-            if (googleMobileAdsConsentManager.canRequestAds()) {
-                loadAd();
-            }
-        }
-    }
+
 
     private void startGame() {
         // Hide the button, and kick off the timer.
         retryButton.setVisibility(View.INVISIBLE);
-        createTimer(GAME_LENGTH_MILLISECONDS);
+        createTimer(GAME_LENGTH_MILLISECONDS, false);
         gamePaused = false;
         gameOver = false;
     }
@@ -630,7 +868,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         }
         // Create a new timer for the correct length.
         gamePaused = false;
-        createTimer(timerMilliseconds);
+        createTimer(timerMilliseconds, false);
     }
 
     private void pauseGame() {
@@ -642,28 +880,6 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
             countDownTimer.cancel();
         }
         gamePaused = true;
-    }
-
-    private void initializeMobileAdsSdk() {
-        if (isMobileAdsInitializeCalled.getAndSet(true)) {
-            return;
-        }
-
-        // Set your test devices.
-//        MobileAds.setRequestConfiguration(
-//                new RequestConfiguration.Builder()
-//                        .setTestDeviceIds(Arrays.asList(TEST_DEVICE_HASHED_ID))
-//                        .build());
-
-        new Thread(
-                () -> {
-                    // Initialize the Google Mobile Ads SDK on a background thread.
-                    MobileAds.initialize(this, initializationStatus -> {});
-
-                    // Load an ad on the main thread.
-                    runOnUiThread(() -> loadAd());
-                })
-                .start();
     }
 
     public void countDownTimeAR(){
@@ -678,32 +894,121 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                 }
 
                 public void onFinish() {
+                    isTimerDone = true;
                     if (autoclose) {
-                        onBackPressed();
-                        // Close the current activity
-                        finish();
-
                         if (countDownTimerAR != null) {
                             countDownTimerAR.cancel();
                             countDownTimerAR = null;
                         }
 
-                        Intent intent;
-                        if (mixbanerinter) {
-                            // Open BananaFixedActivity (You might want to change this to BananaFixedActivity)
-                            intent = new Intent(InataRoomActivity_level1.this, InataRoomActivity_level1.class);
-                        } else {
-                            // Open InataRoomActivity_level1 (stays the same)
-                            intent = new Intent(InataRoomActivity_level1.this, InataRoomActivity_level1.class);
-                        }
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
+                        nutupsponsor();
                     }
                 }
             }.start();
         }
     }
 
+    private void nutupsponsor(){
+        // --- IMPLEMENTASI TEKNIK MEDIUM ---
+        MyApplication application = (MyApplication) getApplicationContext();
+        final Activity foregroundActivity = application.getCurrentForegroundActivity();
+
+        // Cek apakah Activity yang sedang tampil adalah Activity iklan (AdMob atau sejenisnya)
+        if (foregroundActivity != null){
+
+            String className = foregroundActivity.getClass().getName();
+            Log.d("AD_CHECK", "Foreground Activity: " + className);
+            if (className.contains("AdActivity")) { // 1. ADMOB
+                // Pilihan: Gunakan onBackPressed() jika Anda ingin memicu callback standar AdMob
+                // atau gunakan finish() jika Anda ingin penutupan paling paksa.
+                appendLog("Log : Timer selesai. Menutup AdMob Activity: " + className);
+
+                // Opsi Terbaik: Langsung finish() untuk keseragaman dan keandalan
+                foregroundActivity.onBackPressed();
+
+            } else if (className.contains("com.unity3d.ads")) { // 2. UNITY ADS
+                // Gunakan finish() karena onBackPressed() tidak bekerja pada Unity.
+                appendLog("Log : Timer selesai. Menutup Unity Ads Activity: " + className);
+                foregroundActivity.onBackPressed();
+                foregroundActivity.finish();
+            }
+//                            else{
+//                                appendLog("Log : Timer selesai. Menutup Unity Ads Activity: " + className);
+//                                foregroundActivity.finish();
+//                            }
+            Log.d("AD_CHECK", "Foreground Activity 2: " + className);
+
+
+            // 2. Tambahkan jeda (delay) dan kemudian transisi Intent
+            // Jeda diperlukan agar Activity Iklan punya waktu untuk menghilang
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Re-check foreground activity before transitioning
+                    MyApplication currentApplication = (MyApplication) getApplicationContext();
+                    Activity currentForegroundActivity = currentApplication.getCurrentForegroundActivity();
+                    String currentClassName = currentForegroundActivity.getClass().getName();
+                    if (currentForegroundActivity != null) {
+
+                        if (currentClassName.contains("AdActivity") || currentClassName.contains("com.unity3d.ads")) {
+                            Toast.makeText(InataRoomActivity_level1.this, "Ad activity still open, please close it first!", Toast.LENGTH_LONG).show();
+                            appendLog("Log: Ad activity (" + currentClassName + ") still open after delay, not transitioning yet.");
+                            Log.d("AD_CHECK", "currentForegroundActivity still open after delay, not transitioning yet.");
+                        } else {
+                            // Ad activity is no longer in foreground, proceed with transition
+                            Toast.makeText(InataRoomActivity_level1.this, "RUN next act ", Toast.LENGTH_SHORT).show();
+                            Log.d("AD_CHECK", "currentForegroundActivity else RUN next act "+currentClassName);
+                            goToNextActivity();
+                        }
+                    } else {
+                        // No foreground activity, or it's not an ad activity, proceed with transition
+                        Toast.makeText(InataRoomActivity_level1.this, "RUN next act ", Toast.LENGTH_SHORT).show();
+                        Log.d("AD_CHECK", "currentForegroundActivity null RUN next act "+currentClassName);
+                        goToNextActivity();
+                    }
+                }
+            }, 11500); // Jeda 11.5 seconds
+
+        } else {
+            // Jika iklan sudah tertutup atau tidak ditemukan, langsung transisi
+            appendLog("Log : Timer selesai. Activity Iklan tidak ditemukan, langsung transisi.");
+            goToNextActivity();
+        }
+        // --- AKHIR IMPLEMENTASI TEKNIK MEDIUM ---
+    }
+
+    // Di dalam class InataRoomActivity_level1
+    private void goToNextActivity() {
+        // Pastikan timer auto-close/reload dihentikan
+        if (countDownTimerAR != null) {
+            countDownTimerAR.cancel();
+            countDownTimerAR = null;
+        }
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
+
+        if (times != null) {
+            times.setText("Auto-Closing...");
+        }
+        showListener = null;
+        Intent intent;
+        if (mixbanerinter) {
+            intent = new Intent(InataRoomActivity_level1.this, BananaRoomActivity.class);
+        } else {
+            intent = new Intent(InataRoomActivity_level1.this, InataRoomActivity_level2.class);
+        }
+
+
+        // Menggunakan FLAG_ACTIVITY_CLEAR_TASK sebagai fallback keamanan tambahan
+        // jika onBackedPressed() gagal menghancurkan AdActivity.
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+        startActivity(intent);
+        appendLog("Log : Transisi Intent baru dimulai.");
+        finishAffinity();
+    }
 
     public void viewBinds(){
         berhasil=findViewById(R.id.succsestotint);
@@ -716,10 +1021,25 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         close=findViewById(R.id.timeautoReloadINTERTV);
         categori=findViewById(R.id.keywordInter);
         logprogram=findViewById(R.id.logprogram);
+        logScrollView = findViewById(R.id.logScrollView);
         sett=findViewById(R.id.set_interes);
+        clearLogButton = findViewById(R.id.clear_log_button);
+        loadAdmobButton = findViewById(R.id.load_admob_button);
+        loadUnityButton = findViewById(R.id.load_unity_button);
         showon=findViewById(R.id.shoewint);
         impreson=findViewById(R.id.impresint);
         times=findViewById(R.id.timede);
+    }
+
+    private void appendLog(String message) {
+        // Membuat stempel waktu sederhana
+        String timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+
+        // Menambahkan pesan baru ke TextView
+        logprogram.append(timeStamp + " - " + message + "\n");
+
+        // Otomatis scroll ke paling bawah
+        logScrollView.post(() -> logScrollView.fullScroll(View.FOCUS_DOWN));
     }
 
     @SuppressLint("SetTextI18n")
@@ -744,15 +1064,16 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         reload=getBool(RELOADE,this);
 
         tanggalan.setText("Estimates calculation in :\n"+InterstialMe.getString(InterstialMe.DATE,this));
-        if((sharedPref.getInt("ReLoadInata", 0) == 1 )){
+        if((sharedPref.getInt("ReLoadInata", 0) == 1 )) {
             auto.setText("AUTO RELOAD ACTIVE");
         }else {
             auto.setText("AUTO RELOAD OFF");
             times.setText("");
         }
-        if((sharedPref.getInt("ReLoadInata", 0) == 1 )){
+        if((sharedPref.getInt("ReLoadInata", 0) == 1 )) {
             close.setText("AUTO CLOSE ACTIVE ");
-        }else{
+        }
+        else{
             close.setText("AUTO CLOSE OFF");
         }
 
@@ -776,7 +1097,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
     public void CekDateUP(){
         @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy");
         String date = df.format(Calendar.getInstance().getTime());
-        if(!date.equals(InterstialMe.getString(InterstialMe.DATE,this))){
+        if(!date.equals(InterstialMe.getString(InterstialMe.DATE,this))) {
             InterstialMe.saveString(InterstialMe.DATE,date,this);
             resetResult();
 
