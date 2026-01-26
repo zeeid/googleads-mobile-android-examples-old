@@ -59,6 +59,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Arrays;
+import java.io.File; // Import File
 
 import com.unity3d.ads.IUnityAdsLoadListener;
 import com.unity3d.ads.IUnityAdsShowListener;
@@ -216,6 +217,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         @Override
                         public void run() {
                             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                                clearApplicationDataCache(); // Call cache clear before loading AdMob
                                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
                             }
                             else{
@@ -295,6 +297,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     @Override
     public void onInitializationComplete() {
+        clearApplicationDataCache(); // Call cache clear before loading Unity Ad
         DisplayInterstitialAd();
     }
 
@@ -319,7 +322,6 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
     // Implement a function to load an interstitial ad. The ad will start to show after the ad has been loaded.
     public void DisplayInterstitialAd () {
-
         String randomAdUnitId = getRandomUnityAdUnitId();
         UnityAds.load(randomAdUnitId, loadListener);
 
@@ -338,6 +340,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         } else {
             appendLog("Log : UnityAds READY to Show... ");
             // Jika sudah terinisialisasi, Anda bisa langsung coba muat iklannya
+            clearApplicationDataCache(); // Call cache clear before loading Unity Ad
             DisplayInterstitialAd();
         }
     }
@@ -350,6 +353,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                 IsAdmob = true;
                 appendLog("Log : Start Admob ");
                 if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                    clearApplicationDataCache(); // Call cache clear before loading AdMob
                     loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
                 }
                 else{
@@ -358,11 +362,13 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             } else {
                 IsAdmob = false;
                 appendLog("Log : Start Unity ");
+                clearApplicationDataCache(); // Call cache clear before loading Unity Ad
                 loadUnityAd(); // Panggil fungsi untuk memuat Unity
             }
         } else {
             appendLog("Log : Start Single Admob ");
             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                clearApplicationDataCache(); // Call cache clear before loading AdMob
                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
             }
             else{
@@ -393,6 +399,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         finish(); // Close InataRoomActivity
                     } else {
                         appendLog("Log : Not in Indonesia (IP Protection active)");
+                        clearApplicationDataCache(); // Call cache clear before loading ads
                         loadAdsInternal(); // Proceed to load ads if not in Indonesia
                     }
                 }
@@ -403,11 +410,13 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                     appendLog("Log : IP Check Error: " + error + ". Attempting to load ads anyway.");
                     // If there's an error in IP checking, decide whether to proceed or block
                     // For now, let's proceed to load ads to avoid blocking due to API issues.
+                    clearApplicationDataCache(); // Call cache clear before loading ads
                     loadAdsInternal();
                 }
             });
         } else {
             appendLog("Log : IP Protection is OFF. Proceeding to load ads.");
+            clearApplicationDataCache(); // Call cache clear before loading ads
             loadAdsInternal();
         }
     }
@@ -484,6 +493,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 
                     // Now that consent is determined, proceed to load ads if auto-load is enabled.
                     if (isAutoLoad == 1) {
+                        clearApplicationDataCache(); // Call cache clear before loading ads
                         loadAds();
                     }
                 });
@@ -495,6 +505,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             public void onClick(View view) {
                 // When retry button is clicked, re-check consent and load ads if possible
                 if (googleMobileAdsConsentManager.canRequestAds()) {
+                    clearApplicationDataCache(); // Call cache clear before loading ads
                     loadAds();
                 } else {
                     
@@ -507,6 +518,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                             else {
                                 // After showing form, retry loading ads if consent is now granted
                                 if (googleMobileAdsConsentManager.canRequestAds()) {
+                                    clearApplicationDataCache(); // Call cache clear before loading ads
                                     loadAds();
                                 }
                             }
@@ -552,6 +564,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             // Pastikan SDK sudah siap dan ada izin sebelum memuat
             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
                 IsAdmob = true; // Force AdMob for this button click
+                clearApplicationDataCache(); // Call cache clear before loading AdMob
                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
             } else {
                 appendLog("Log : Admob Belum Consent #LoadAdmobButton");
@@ -563,6 +576,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             appendLog("Tombol 'Load Unity' diklik. Memulai proses...");
             // Fungsi loadUnityAd sudah menangani inisialisasi jika diperlukan
             IsAdmob = false; // Force Unity for this button click
+            clearApplicationDataCache(); // Call cache clear before loading Unity Ad
             loadUnityAd();
         });
     }
@@ -683,6 +697,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
+                                        clearApplicationDataCache(); // Call cache clear before loading Unity Ad
                                         loadUnityAd();
                                     }
                                 }, 5000);
@@ -1127,5 +1142,35 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
     public static Boolean getBool(String key, Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getBoolean(key, false);
+    }
+
+    private void clearApplicationDataCache() {
+        try {
+            File cacheDir = getCacheDir();
+            if (cacheDir != null && cacheDir.isDirectory()) {
+                deleteDir(cacheDir);
+                appendLog("Log: Cache aplikasi berhasil dihapus.");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Gagal menghapus cache: " + e.getMessage());
+            appendLog("Log: Gagal menghapus cache aplikasi: " + e.getMessage());
+        }
+    }
+
+    private boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+            return dir.delete();
+        } else if (dir != null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
+        }
     }
 }
