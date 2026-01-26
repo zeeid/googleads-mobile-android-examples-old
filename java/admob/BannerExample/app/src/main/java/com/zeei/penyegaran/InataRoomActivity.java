@@ -33,6 +33,7 @@ import android.widget.Toast;
 import android.app.Activity;
 import android.widget.ScrollView;
 import android.os.Handler; // Import Handler
+import android.text.Html; // Import Html for colored text
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -197,12 +198,13 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
 //                //nutupsponsor();
                 countDownTimeAR();
             }
+            appendLog("Log : Berhasil Memuat iklan interstitial Unity", 1);
         }
 
         @Override
         public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
             Log.e("UnityAdsExample", "Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
-            appendLog("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+            appendLog("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message, 2);
             categori.setText("Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
 
             gagalt++;
@@ -226,7 +228,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         }
                     }, 5000);
                 } else {
-                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit", 2);
                     Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -236,7 +238,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         appendLog("Log : Mencoba Load Lagi "+failovercount);
                         createTimer(0,true);
                     } else {
-                        appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                        appendLog("Log : gagal failover load multi network check internet / akun nya kena limit", 2);
                         Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -249,7 +251,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         public void onUnityAdsShowFailure(String placementId, UnityAds.UnityAdsShowError error, String message) {
             Log.e("UnityAdsExample", "Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
 
-            appendLog("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
+            appendLog("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message, 2);
 
         }
 
@@ -315,7 +317,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             }
         }else{
             countDownTimer.cancel();
-            appendLog("Log: Unity Ads initialization failed with error: [" + error + "] " + message);
+            appendLog("Log: Unity Ads initialization failed with error: [" + error + "] " + message, 2);
             Toast.makeText(InataRoomActivity.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
         }
     }
@@ -328,7 +330,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         requestot++;
         InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,this);
         dataC();
-        appendLog("Log : Berhasil Memuat iklan interstitial Unity");
+        // The appendLog for success is now inside onUnityAdsAdLoaded
     }
 
     // REMOVED loadAdmobAd() method. Its logic is integrated into onCreate.
@@ -609,7 +611,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                         berhasilt++;
                         InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity.this);
                         dataC();
-                        appendLog("Log : Berhasil Memuat iklan interstitial");
+                        appendLog("Log : Berhasil Memuat iklan interstitial", 1);
                         interstitialAd.setFullScreenContentCallback(
                                 new FullScreenContentCallback() {
                                     @Override
@@ -702,7 +704,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                     }
                                 }, 5000);
                             } else {
-                                appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                                appendLog("Log : gagal failover load multi network check internet / akun nya kena limit", 2);
                                 Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -712,7 +714,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                     appendLog("Log : Mencoba Load Lagi "+failovercount);
                                     createTimer(0,true);
                                 } else {
-                                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit", 2);
                                     Toast.makeText(InataRoomActivity.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
                                 }
 
@@ -735,7 +737,7 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
                                         InataRoomActivity.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT)
                                 .show();
 
-                        appendLog("Log : Error ADMOB "+error);
+                        appendLog("Log : Error ADMOB "+error, 2);
 
                         categori.setText("Log : Error ADMOB "+error);
 
@@ -1046,15 +1048,34 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
         times=findViewById(R.id.timede);
     }
 
-    private void appendLog(String message) {
+    private void appendLog(String message, int colorType) {
         // Membuat stempel waktu sederhana
         String timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
 
-        // Menambahkan pesan baru ke TextView
-        logprogram.append(timeStamp + " - " + message + "\n");
+        String coloredMessage;
+        switch (colorType) {
+            case 1: // Success (Green)
+                coloredMessage = "<font color='#4CAF50'>" + timeStamp + " - " + message + "</font>"; // Green color
+                break;
+            case 2: // Failure (Red)
+                coloredMessage = "<font color='#F44336'>" + timeStamp + " - " + message + "</font>"; // Red color
+                break;
+            default: // Default (Black or current text color)
+                coloredMessage = timeStamp + " - " + message;
+                break;
+        }
+
+        // Menambahkan pesan baru ke TextView dengan warna
+        // Using append with Html.fromHtml on a TextView set to append will work to add new formatted lines.
+        logprogram.append(Html.fromHtml(coloredMessage + "<br/>")); // Use <br/> for new line in HTML
 
         // Otomatis scroll ke paling bawah
         logScrollView.post(() -> logScrollView.fullScroll(View.FOCUS_DOWN));
+    }
+
+    // Overloaded method for existing calls that don't specify color, defaults to regular text.
+    private void appendLog(String message) {
+        appendLog(message, 0); // Call with default color
     }
 
     @SuppressLint("SetTextI18n")
@@ -1169,7 +1190,8 @@ public  class InataRoomActivity extends AppCompatActivity implements IUnityAdsIn
             return dir.delete();
         } else if (dir != null && dir.isFile()) {
             return dir.delete();
-        } else {
+        }
+        else {
             return false;
         }
     }
