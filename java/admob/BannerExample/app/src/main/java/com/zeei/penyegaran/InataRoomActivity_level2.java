@@ -33,6 +33,7 @@ import android.widget.Toast;
 import android.app.Activity;
 import android.widget.ScrollView;
 import android.os.Handler; // Import Handler
+import android.text.Html; // Import Html for colored text
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -59,6 +60,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Arrays;
+import java.io.File; // Import File
 
 import com.unity3d.ads.IUnityAdsLoadListener;
 import com.unity3d.ads.IUnityAdsShowListener;
@@ -73,7 +75,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
     public static final String TEST_DEVICE_HASHED_ID = "ABCDEF012345";
 
     private static final long GAME_LENGTH_MILLISECONDS = 9000;
-    private static final String TAG = "InataRoomActivity";
+    private static final String TAG = "InataRoomActivity_level2";
 
     private final AtomicBoolean isMobileAdsInitializeCalled = new AtomicBoolean(false);
     private GoogleMobileAdsConsentManager googleMobileAdsConsentManager;
@@ -196,12 +198,13 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
 //                //nutupsponsor();
                 countDownTimeAR();
             }
+            appendLog("Log : Berhasil Memuat iklan interstitial Unity", 1);
         }
 
         @Override
         public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
             Log.e("UnityAdsExample", "Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
-            appendLog("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
+            appendLog("Log : Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message, 2);
             categori.setText("Unity Ads failed to load ad for " + placementId + " with error: [" + error + "] " + message);
 
             gagalt++;
@@ -216,6 +219,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                         @Override
                         public void run() {
                             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                                clearApplicationDataCache(); // Call cache clear before loading AdMob
                                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
                             }
                             else{
@@ -224,7 +228,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                         }
                     }, 5000);
                 } else {
-                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit", 2);
                     Toast.makeText(InataRoomActivity_level2.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -234,7 +238,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                         appendLog("Log : Mencoba Load Lagi "+failovercount);
                         createTimer(0,true);
                     } else {
-                        appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                        appendLog("Log : gagal failover load multi network check internet / akun nya kena limit", 2);
                         Toast.makeText(InataRoomActivity_level2.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -247,7 +251,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
         public void onUnityAdsShowFailure(String placementId, UnityAds.UnityAdsShowError error, String message) {
             Log.e("UnityAdsExample", "Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
 
-            appendLog("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message);
+            appendLog("Log : Unity Ads failed to show ad for " + placementId + " with error: [" + error + "] " + message, 2);
 
         }
 
@@ -295,6 +299,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
 
     @Override
     public void onInitializationComplete() {
+        clearApplicationDataCache(); // Call cache clear before loading Unity Ad
         DisplayInterstitialAd();
     }
 
@@ -312,21 +317,20 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
             }
         }else{
             countDownTimer.cancel();
-            appendLog("Log: Unity Ads initialization failed with error: [" + error + "] " + message);
+            appendLog("Log: Unity Ads initialization failed with error: [" + error + "] " + message, 2);
             Toast.makeText(InataRoomActivity_level2.this, "Reload Jika Fail: "+keepgoing, Toast.LENGTH_SHORT).show();
         }
     }
 
     // Implement a function to load an interstitial ad. The ad will start to show after the ad has been loaded.
     public void DisplayInterstitialAd () {
-
         String randomAdUnitId = getRandomUnityAdUnitId();
         UnityAds.load(randomAdUnitId, loadListener);
 
         requestot++;
         InterstialMe.saveInteger(InterstialMe.JMLREQUEST,requestot,this);
         dataC();
-        appendLog("Log : Berhasil Memuat iklan interstitial Unity");
+        // The appendLog for success is now inside onUnityAdsAdLoaded
     }
 
     // REMOVED loadAdmobAd() method. Its logic is integrated into onCreate.
@@ -338,6 +342,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
         } else {
             appendLog("Log : UnityAds READY to Show... ");
             // Jika sudah terinisialisasi, Anda bisa langsung coba muat iklannya
+            clearApplicationDataCache(); // Call cache clear before loading Unity Ad
             DisplayInterstitialAd();
         }
     }
@@ -350,6 +355,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                 IsAdmob = true;
                 appendLog("Log : Start Admob ");
                 if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                    clearApplicationDataCache(); // Call cache clear before loading AdMob
                     loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
                 }
                 else{
@@ -358,11 +364,13 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
             } else {
                 IsAdmob = false;
                 appendLog("Log : Start Unity ");
+                clearApplicationDataCache(); // Call cache clear before loading Unity Ad
                 loadUnityAd(); // Panggil fungsi untuk memuat Unity
             }
         } else {
             appendLog("Log : Start Single Admob ");
             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
+                clearApplicationDataCache(); // Call cache clear before loading AdMob
                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
             }
             else{
@@ -393,6 +401,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                         finish(); // Close InataRoomActivity_level2
                     } else {
                         appendLog("Log : Not in Indonesia (IP Protection active)");
+                        clearApplicationDataCache(); // Call cache clear before loading ads
                         loadAdsInternal(); // Proceed to load ads if not in Indonesia
                     }
                 }
@@ -403,11 +412,13 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                     appendLog("Log : IP Check Error: " + error + ". Attempting to load ads anyway.");
                     // If there's an error in IP checking, decide whether to proceed or block
                     // For now, let's proceed to load ads to avoid blocking due to API issues.
+                    clearApplicationDataCache(); // Call cache clear before loading ads
                     loadAdsInternal();
                 }
             });
         } else {
             appendLog("Log : IP Protection is OFF. Proceeding to load ads.");
+            clearApplicationDataCache(); // Call cache clear before loading ads
             loadAdsInternal();
         }
     }
@@ -484,6 +495,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
 
                     // Now that consent is determined, proceed to load ads if auto-load is enabled.
                     if (isAutoLoad == 1) {
+                        clearApplicationDataCache(); // Call cache clear before loading ads
                         loadAds();
                     }
                 });
@@ -495,6 +507,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
             public void onClick(View view) {
                 // When retry button is clicked, re-check consent and load ads if possible
                 if (googleMobileAdsConsentManager.canRequestAds()) {
+                    clearApplicationDataCache(); // Call cache clear before loading ads
                     loadAds();
                 } else {
 
@@ -507,6 +520,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                             else {
                                 // After showing form, retry loading ads if consent is now granted
                                 if (googleMobileAdsConsentManager.canRequestAds()) {
+                                    clearApplicationDataCache(); // Call cache clear before loading ads
                                     loadAds();
                                 }
                             }
@@ -552,6 +566,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
             // Pastikan SDK sudah siap dan ada izin sebelum memuat
             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
                 IsAdmob = true; // Force AdMob for this button click
+                clearApplicationDataCache(); // Call cache clear before loading AdMob
                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
             } else {
                 appendLog("Log : Admob Belum Consent #LoadAdmobButton");
@@ -563,6 +578,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
             appendLog("Tombol 'Load Unity' diklik. Memulai proses...");
             // Fungsi loadUnityAd sudah menangani inisialisasi jika diperlukan
             IsAdmob = false; // Force Unity for this button click
+            clearApplicationDataCache(); // Call cache clear before loading Unity Ad
             loadUnityAd();
         });
     }
@@ -595,7 +611,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                         berhasilt++;
                         InterstialMe.saveInteger(InterstialMe.BERHASIL,berhasilt,InataRoomActivity_level2.this);
                         dataC();
-                        appendLog("Log : Berhasil Memuat iklan interstitial");
+                        appendLog("Log : Berhasil Memuat iklan interstitial", 1);
                         interstitialAd.setFullScreenContentCallback(
                                 new FullScreenContentCallback() {
                                     @Override
@@ -683,11 +699,12 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
+                                        clearApplicationDataCache(); // Call cache clear before loading Unity Ad
                                         loadUnityAd();
                                     }
                                 }, 5000);
                             } else {
-                                appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                                appendLog("Log : gagal failover load multi network check internet / akun nya kena limit", 2);
                                 Toast.makeText(InataRoomActivity_level2.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -697,7 +714,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                                     appendLog("Log : Mencoba Load Lagi "+failovercount);
                                     createTimer(0,true);
                                 } else {
-                                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit");
+                                    appendLog("Log : gagal failover load multi network check internet / akun nya kena limit", 2);
                                     Toast.makeText(InataRoomActivity_level2.this, "gagal failover load multi network check internet / akun nya kena limit", Toast.LENGTH_SHORT).show();
                                 }
 
@@ -720,7 +737,7 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
                                         InataRoomActivity_level2.this, "onAdFailedToLoad() with error: " + error, Toast.LENGTH_SHORT)
                                 .show();
 
-                        appendLog("Log : Error ADMOB "+error);
+                        appendLog("Log : Error ADMOB "+error, 2);
 
                         categori.setText("Log : Error ADMOB "+error);
 
@@ -1031,15 +1048,34 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
         times=findViewById(R.id.timede);
     }
 
-    private void appendLog(String message) {
+    private void appendLog(String message, int colorType) {
         // Membuat stempel waktu sederhana
         String timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
 
-        // Menambahkan pesan baru ke TextView
-        logprogram.append(timeStamp + " - " + message + "\n");
+        String coloredMessage;
+        switch (colorType) {
+            case 1: // Success (Green)
+                coloredMessage = "<font color='#4CAF50'>" + timeStamp + " - " + message + "</font>"; // Green color
+                break;
+            case 2: // Failure (Red)
+                coloredMessage = "<font color='#F44336'>" + timeStamp + " - " + message + "</font>"; // Red color
+                break;
+            default: // Default (Black or current text color)
+                coloredMessage = timeStamp + " - " + message;
+                break;
+        }
+
+        // Menambahkan pesan baru ke TextView dengan warna
+        // Using append with Html.fromHtml on a TextView set to append will work to add new formatted lines.
+        logprogram.append(Html.fromHtml(coloredMessage + "<br/>")); // Use <br/> for new line in HTML
 
         // Otomatis scroll ke paling bawah
         logScrollView.post(() -> logScrollView.fullScroll(View.FOCUS_DOWN));
+    }
+
+    // Overloaded method for existing calls that don't specify color, defaults to regular text.
+    private void appendLog(String message) {
+        appendLog(message, 0); // Call with default color
     }
 
     @SuppressLint("SetTextI18n")
@@ -1127,5 +1163,36 @@ public  class InataRoomActivity_level2 extends AppCompatActivity implements IUni
     public static Boolean getBool(String key, Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getBoolean(key, false);
+    }
+
+    private void clearApplicationDataCache() {
+        try {
+            File cacheDir = getCacheDir();
+            if (cacheDir != null && cacheDir.isDirectory()) {
+                deleteDir(cacheDir);
+                appendLog("Log: Cache aplikasi berhasil dihapus.");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Gagal menghapus cache: " + e.getMessage());
+            appendLog("Log: Gagal menghapus cache aplikasi: " + e.getMessage());
+        }
+    }
+
+    private boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+            return dir.delete();
+        } else if (dir != null && dir.isFile()) {
+            return dir.delete();
+        }
+        else {
+            return false;
+        }
     }
 }
