@@ -219,7 +219,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                         @Override
                         public void run() {
                             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
-                                clearApplicationDataCache(); // Call cache clear before loading AdMob
+
                                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
                             }
                             else{
@@ -299,7 +299,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
 
     @Override
     public void onInitializationComplete() {
-        clearApplicationDataCache(); // Call cache clear before loading Unity Ad
+
         DisplayInterstitialAd();
     }
 
@@ -342,7 +342,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         } else {
             appendLog("Log : UnityAds READY to Show... ");
             // Jika sudah terinisialisasi, Anda bisa langsung coba muat iklannya
-            clearApplicationDataCache(); // Call cache clear before loading Unity Ad
+
             DisplayInterstitialAd();
         }
     }
@@ -355,7 +355,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                 IsAdmob = true;
                 appendLog("Log : Start Admob ");
                 if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
-                    clearApplicationDataCache(); // Call cache clear before loading AdMob
+
                     loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
                 }
                 else{
@@ -364,13 +364,13 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
             } else {
                 IsAdmob = false;
                 appendLog("Log : Start Unity ");
-                clearApplicationDataCache(); // Call cache clear before loading Unity Ad
+
                 loadUnityAd(); // Panggil fungsi untuk memuat Unity
             }
         } else {
             appendLog("Log : Start Single Admob ");
             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
-                clearApplicationDataCache(); // Call cache clear before loading AdMob
+
                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
             }
             else{
@@ -401,7 +401,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                         finish(); // Close InataRoomActivity_level1
                     } else {
                         appendLog("Log : Not in Indonesia (IP Protection active)");
-                        clearApplicationDataCache(); // Call cache clear before loading ads
+
                         loadAdsInternal(); // Proceed to load ads if not in Indonesia
                     }
                 }
@@ -412,13 +412,13 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                     appendLog("Log : IP Check Error: " + error + ". Attempting to load ads anyway.");
                     // If there's an error in IP checking, decide whether to proceed or block
                     // For now, let's proceed to load ads to avoid blocking due to API issues.
-                    clearApplicationDataCache(); // Call cache clear before loading ads
+
                     loadAdsInternal();
                 }
             });
         } else {
             appendLog("Log : IP Protection is OFF. Proceeding to load ads.");
-            clearApplicationDataCache(); // Call cache clear before loading ads
+
             loadAdsInternal();
         }
     }
@@ -430,6 +430,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
         viewBinds();
         CekDateUP();
         data();
+        clearApplicationDataCache(); // Call cache clear before loading Unity Ad
 
         unityGameID = getString(R.string.unity_game_id);
 
@@ -495,7 +496,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
 
                     // Now that consent is determined, proceed to load ads if auto-load is enabled.
                     if (isAutoLoad == 1) {
-                        clearApplicationDataCache(); // Call cache clear before loading ads
+
                         loadAds();
                     }
                 });
@@ -507,7 +508,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
             public void onClick(View view) {
                 // When retry button is clicked, re-check consent and load ads if possible
                 if (googleMobileAdsConsentManager.canRequestAds()) {
-                    clearApplicationDataCache(); // Call cache clear before loading ads
+
                     loadAds();
                 } else {
 
@@ -520,7 +521,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                             else {
                                 // After showing form, retry loading ads if consent is now granted
                                 if (googleMobileAdsConsentManager.canRequestAds()) {
-                                    clearApplicationDataCache(); // Call cache clear before loading ads
+
                                     loadAds();
                                 }
                             }
@@ -566,7 +567,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
             // Pastikan SDK sudah siap dan ada izin sebelum memuat
             if (googleMobileAdsConsentManager != null && googleMobileAdsConsentManager.canRequestAds()) {
                 IsAdmob = true; // Force AdMob for this button click
-                clearApplicationDataCache(); // Call cache clear before loading AdMob
+
                 loadAd(); // Langsung panggil fungsi untuk memuat iklan AdMob
             } else {
                 appendLog("Log : Admob Belum Consent #LoadAdmobButton");
@@ -578,7 +579,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
             appendLog("Tombol 'Load Unity' diklik. Memulai proses...");
             // Fungsi loadUnityAd sudah menangani inisialisasi jika diperlukan
             IsAdmob = false; // Force Unity for this button click
-            clearApplicationDataCache(); // Call cache clear before loading Unity Ad
+
             loadUnityAd();
         });
     }
@@ -699,7 +700,7 @@ public  class InataRoomActivity_level1 extends AppCompatActivity implements IUni
                                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        clearApplicationDataCache(); // Call cache clear before loading Unity Ad
+
                                         loadUnityAd();
                                     }
                                 }, 5000);
