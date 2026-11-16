@@ -9,17 +9,8 @@
 
       android:theme="@style/AppTheme">
 
-    <!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
-    <meta-data
-        android:name="com.google.android.gms.ads.APPLICATION_ID"
-        android:value="ca-app-pub-7944170612384609~9759329116" />
-
-    <meta-data
-        android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
-        android:value="true" />
-
     <activity
-        android:name="com.mubaraq.managementsistem.LoginActivity"
+        android:name="com.mubaraq.mmis.LoginActivity"
 
         android:exported="true">
       <intent-filter>
@@ -30,14 +21,14 @@
     </activity>
 
 
-    <activity android:name=".InataRoomActivity" android:theme="@style/AppTheme"/>
-    <activity android:name=".InataRoomActivity_level1" android:theme="@style/AppTheme"/>
-    <activity android:name=".InataRoomActivity_level2" android:theme="@style/AppTheme"/>
-    <activity android:name=".InataRoomActivity_level3" android:theme="@style/AppTheme"/>
-
     <activity
         android:name=".MainActivity">
     </activity>
+    <activity android:name=".MiniGameActivity" android:theme="@style/AppTheme"/>
+
+    <meta-data
+        android:name="com.google.android.gms.ads.APPLICATION_ID"
+        android:value="ca-app-pub-3940256099942544~3347511713"/>
   </application>
 
 </manifest>

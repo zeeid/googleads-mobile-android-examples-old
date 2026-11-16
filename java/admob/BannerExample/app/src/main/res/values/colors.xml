@@ -10,4 +10,13 @@
     <color name="colorPrimaryText">#212121</color>
     <color name="colorSecondaryText">#757575</color>
     <color name="colorAccentText">#FFFFFF</color>
+
+    <!-- Warna untuk UI yang dipercantik -->
+    <color name="surface">#F5F5F5</color>
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="successGreen">#4CAF50</color>
+    <color name="warningOrange">#FF9800</color>
+    <color name="infoBlue">#2196F3</color>
+    <color name="divider">#E0E0E0</color>
+    <color name="placeholderText">#9E9E9E</color>
 </resources>

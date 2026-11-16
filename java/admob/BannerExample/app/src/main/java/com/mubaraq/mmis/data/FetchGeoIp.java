@@ -1,10 +1,10 @@
-package com.mubaraq.managementsistem.data;
+package com.mubaraq.mmis.data;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.mubaraq.managementsistem.MainActivity;
+import com.mubaraq.mmis.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;

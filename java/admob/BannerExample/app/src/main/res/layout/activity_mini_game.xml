@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/surface"
+    tools:context=".MiniGameActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_screen"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tebak Angka"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginBottom="@dimen/spacing_small"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/textRange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Angka antara 1 - 100"
+            android:textSize="@dimen/text_size_medium"
+            android:textColor="@color/colorSecondaryText"
+            android:layout_marginBottom="@dimen/spacing_large"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/textAttempts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Percobaan: 0"
+            android:textSize="@dimen/text_size_medium"
+            android:textColor="@color/colorPrimaryText"
+            android:layout_marginBottom="@dimen/spacing_medium"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/textLuckPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Poin Keberuntungan: 0"
+            android:textSize="@dimen/text_size_medium"
+            android:textColor="@color/successGreen"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_large"
+            tools:ignore="HardcodedText" />
+
+        <EditText
+            android:id="@+id/editGuess"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:hint="Masukkan angka"
+            android:inputType="number"
+            android:maxLength="3"
+            android:ems="5"
+            android:padding="@dimen/spacing_medium"
+            android:textSize="@dimen/text_size_medium"
+            android:background="@color/cardBackground"
+            android:elevation="2dp"
+            android:layout_marginBottom="@dimen/spacing_medium"
+            tools:ignore="HardcodedText" />
+
+        <Button
+            android:id="@+id/buttonGuess"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:text="Tebak"
+            android:textColor="@color/colorAccentText"
+            android:backgroundTint="@color/colorPrimary"
+            android:textSize="@dimen/text_size_medium"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_medium"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/textResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="@dimen/text_size_medium"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryText"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:gravity="center"
+            tools:ignore="HardcodedText" />
+
+        <Button
+            android:id="@+id/buttonReset"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:text="Main Lagi"
+            android:textColor="@color/colorAccentText"
+            android:backgroundTint="@color/warningOrange"
+            android:textSize="@dimen/text_size_medium"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_large"
+            tools:ignore="HardcodedText" />
+
+        <Button
+            android:id="@+id/buttonBack"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:text="Kembali"
+            android:textColor="@color/colorAccentText"
+            android:backgroundTint="@color/colorSecondaryText"
+            android:textSize="@dimen/text_size_medium"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" />
+
+    </LinearLayout>
+</ScrollView>

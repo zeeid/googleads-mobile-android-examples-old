@@ -1,4 +1,4 @@
-package com.mubaraq.managementsistem.data;
+package com.mubaraq.mmis.data;
 
 
 import android.annotation.SuppressLint;
