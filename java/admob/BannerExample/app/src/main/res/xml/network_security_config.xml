@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <domain-config cleartextTrafficPermitted="false">
-    <domain includeSubdomains="true">api.jundi.hm</domain>
+        <domain includeSubdomains="true">api.jundi.hm</domain>
+        <domain includeSubdomains="true">consent.google.com</domain>
+        <domain includeSubdomains="true">www.google.com</domain>
     </domain-config>
 </network-security-config>

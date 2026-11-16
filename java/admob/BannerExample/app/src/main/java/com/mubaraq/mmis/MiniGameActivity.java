@@ -38,6 +38,7 @@ public class MiniGameActivity extends AppCompatActivity {
     private long lastAdTime = 0;
 
     private InterstitialAd interstitialAd;
+    private GoogleMobileAdsConsentManager consentManager;
 
     private TextView textAttempts;
     private TextView textResult;
@@ -51,10 +52,25 @@ public class MiniGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mini_game);
 
-        MobileAds.initialize(this, initializationStatus -> {
-            // Inisialisasi selesai, baru muat iklan
-            loadInterstitialAd();
-        });
+        consentManager = GoogleMobileAdsConsentManager.getInstance(getApplicationContext());
+        consentManager.gatherConsent(
+                this,
+                consentError -> {
+                    if (consentError != null) {
+                        android.util.Log.w(
+                                "MiniGame",
+                                String.format("%s: %s", consentError.getErrorCode(), consentError.getMessage()));
+                    }
+
+                    if (consentManager.canRequestAds()) {
+                        initializeMobileAdsSdk();
+                    }
+                });
+
+        // Coba gunakan consent dari sesi sebelumnya
+        if (consentManager.canRequestAds()) {
+            initializeMobileAdsSdk();
+        }
 
         textAttempts = findViewById(R.id.textAttempts);
         textResult = findViewById(R.id.textResult);
@@ -114,6 +130,13 @@ public class MiniGameActivity extends AppCompatActivity {
             public void onClick(View v) {
                 finish();
             }
+        });
+    }
+
+    private void initializeMobileAdsSdk() {
+        MobileAds.initialize(this, initializationStatus -> {
+            // Inisialisasi selesai, baru muat iklan
+            loadInterstitialAd();
         });
     }
 
